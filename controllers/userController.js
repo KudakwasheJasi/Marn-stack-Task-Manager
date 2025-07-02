@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 01/07/2025 - 14:40:42
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 01/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import { response } from "express";
 import User from "../models/User.js";
 import { createJWT } from "../utils/index.js";
@@ -83,8 +95,10 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     res.cookie("token", "", {
-      htttpOnly: true,
+      httpOnly: true,
       expires: new Date(0),
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
     });
 
     res.status(200).json({ message: "Logout successful" });
@@ -200,7 +214,7 @@ export const changeUserPassword = async (req, res) => {
 
       res.status(201).json({
         status: true,
-        message: `Password chnaged successfully.`,
+        message: `Password changed successfully.`,
       });
     } else {
       res.status(404).json({ status: false, message: "User not found" });

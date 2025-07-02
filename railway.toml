@@ -1,0 +1,24 @@
+[builds]
+  0 = "node:18-slim"
+
+[builds.0]
+  cmd = "npm install"
+  dir = "."
+  dockerfile = "Dockerfile"
+
+[deploy]
+  cmd = "npm start"
+  port = 8800
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8800"
+  MONGODB_URI = "mongodb+srv://your_username:your_password@your_cluster.mongodb.net/your_database"
+  JWT_SECRET = "your_jwt_secret"
+
+[env.production]
+  NODE_ENV = "production"
+  PORT = "8800"
+  MONGODB_URI = "mongodb+srv://your_username:your_password@your_cluster.mongodb.net/your_database"
+  JWT_SECRET = "your_jwt_secret"
+  MONGODB_URI = ""

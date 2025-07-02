@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 30/06/2025 - 22:05:55
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 30/06/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -26,9 +38,22 @@ router.post("/login", async (req, res) => {
         }
 
         const sanitizedEmail = sanitizeInput(email.toLowerCase(), true);
+        console.log('Sanitized email:', sanitizedEmail); // Debug log
 
         const user = await User.findOne({ email: sanitizedEmail });
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        console.log('User found:', user); // Debug log
+
+        if (!user) {
+            return res.status(401).json({
+                status: false,
+                message: "Invalid email or password"
+            });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match:', passwordMatch); // Debug log
+
+        if (!passwordMatch) {
             return res.status(401).json({
                 status: false,
                 message: "Invalid email or password"
@@ -69,20 +94,20 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Register route - keeping core functionality but improving error handling
+// Register route - FIXED: do NOT hash password here!
 router.post("/register", async (req, res) => {
     try {
-        console.log('Registration attempt:', req.body); // Debug log
+        console.log('Registration attempt:', req.body);
         const { name, email, password } = req.body;
 
         const sanitizedName = sanitizeInput(name);
         const sanitizedEmail = sanitizeInput(email.toLowerCase(), true);
 
-        // Combined validation check
-        if (!sanitizedName || !sanitizedEmail || !password || 
-            !validateName(sanitizedName) || 
-            !validateEmail(sanitizedEmail) || 
+        if (!sanitizedName || !sanitizedEmail || !password ||
+            !validateName(sanitizedName) ||
+            !validateEmail(sanitizedEmail) ||
             !validatePassword(password)) {
+            console.log('Validation failed:', { sanitizedName, sanitizedEmail, password });
             return res.status(400).json({
                 status: false,
                 message: "Please check all fields and try again"
@@ -97,11 +122,11 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        // Do NOT hash password here! Let the pre-save hook do it.
         const user = await User.create({
             name: sanitizedName,
             email: sanitizedEmail,
-            password: hashedPassword,
+            password, // plain password
             createdAt: new Date(),
             isAdmin: false
         });
@@ -171,7 +196,7 @@ router.get("/me", authenticateToken, async (req, res) => {
 // Logout route
 router.post("/logout", authenticateToken, (req, res) => {
     try {
-      
+ 
         res.json({
             status: true,
             message: "Logged out successfully"
@@ -181,6 +206,53 @@ router.post("/logout", authenticateToken, (req, res) => {
         res.status(500).json({
             status: false,
             message: "Logout failed"
+        });
+    }
+});
+
+// Update user profile route
+router.post("/profile/update", authenticateToken, async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const { name, title, role } = req.body;
+
+        // Validate inputs
+        if (!name || !title || !role) {
+            return res.status(400).json({
+                status: false,
+                message: "All fields are required"
+            });
+        }
+
+        // Update user profile
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                name,
+                title,
+                role,
+                updatedAt: new Date()
+            },
+            { new: true }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            status: true,
+            message: "Profile updated successfully",
+            user: updatedUser
+        });
+    } catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({
+            status: false,
+            message: "Failed to update profile"
         });
     }
 });

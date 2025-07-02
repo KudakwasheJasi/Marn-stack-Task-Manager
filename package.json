@@ -5,7 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "render deploy --env node --name task-manager-api --start-command \"npm start\" --build-command \"npm install\" --env-vars MONGODB_URI=$MONGODB_URI,PORT=3000"
   },
   "author": "",
   "license": "ISC",

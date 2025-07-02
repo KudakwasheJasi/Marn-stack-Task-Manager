@@ -10,7 +10,7 @@ import { protectRoute } from './middlewares/authMiddlewave.js';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8000; // Changed to 8000 to match client config
+const port = process.env.PORT || 5000; // Changed to 8000 to match client config
 
 // Enhanced CORS configuration
 app.use(cors({
@@ -66,7 +66,7 @@ app.use((err, req, res, next) => {
         method: req.method
     });
 
-    const statusCode = err.statusCode || 500;
+    const statusCode = err.statusCode || 8800;
     res.status(statusCode).json({
         status: false,
         message: err.message || 'Something went wrong!',

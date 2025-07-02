@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 01/07/2025 - 20:46:24
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 01/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import express from "express";
 import { isAdminRoute, protectRoute } from "../middlewares/authMiddlewave.js";
 import {

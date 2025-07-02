@@ -1,4 +1,17 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 01/07/2025 - 13:07:08
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 01/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -24,16 +37,33 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['user', 'admin'],
-        default: 'user'  // Set default value
+        default: 'user'
     },
     title: {
         type: String,
-        default: 'Member'  // Set default value
+        default: 'Member'
     },
     isAdmin: {
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
+
+// Hash the password before saving the user
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    next();
+});
+
+// Method to check if the user is an admin
+userSchema.methods.isAdminUser = function() {
+    return this.role === 'admin';
+};
+
+// Method to compare passwords
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
 export default mongoose.model('User', userSchema);

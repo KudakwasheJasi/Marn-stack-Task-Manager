@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 01/07/2025 - 16:00:23
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 01/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import Notice from "../models/notification.js";
 import Task from "../models/task.js";
 import User from "../models/User.js";
@@ -280,22 +292,40 @@ export const createSubTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, date, team, stage, priority, assets } = req.body;
+    const { title, description, priority, stage, team, assets } = req.body;
 
     const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({
+        status: false,
+        message: "Task not found",
+      });
+    }
 
-    task.title = title;
-    task.date = date;
-    task.priority = priority.toLowerCase();
-    task.assets = assets;
-    task.stage = stage.toLowerCase();
-    task.team = team;
+    // Update task fields
+    task.title = title || task.title;
+    task.description = description || task.description;
+    task.priority = priority || task.priority;
+    task.stage = stage || task.stage;
+    task.team = team || task.team;
+    task.assets = assets || task.assets;
+    task.updatedAt = new Date();
+
+    // Add update activity
+    task.activities.push({
+      type: "updated",
+      activity: "Task updated",
+      by: req.user.userId,
+      date: new Date(),
+    });
 
     await task.save();
 
-    res
-      .status(200)
-      .json({ status: true, message: "Task duplicated successfully." });
+    res.json({
+      status: true,
+      message: "Task updated successfully",
+      task,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ status: false, message: error.message });
