@@ -12,4 +12,4 @@ nodeVersion = "18"
 instanceType = "shared-cpu"
 autoDeploy = true
 root = "."
-workingDirectory = "/opt/render/project/src"
+workingDirectory = "/opt/render/project"
