@@ -4,9 +4,10 @@ env = "node"
 startCommand = "npm start"
 buildCommand = "npm install"
 envVars = [
-  { key = "MONGODB_URI", value = "mongodb+srv://your_username:your_password@your_cluster.mongodb.net/your_database" },
+  { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" },
   { key = "PORT", value = "8800" },
-  { key = "JWT_SECRET", value = "your_jwt_secret" }
+  { key = "JWT_SECRET", value = "kjewhuhewhugheygy" }
 ]
 instanceType = "shared-cpu"
 autoDeploy = true
+root = "server"
