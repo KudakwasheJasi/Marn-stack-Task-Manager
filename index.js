@@ -1,10 +1,11 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { dbConnection } from './server/utils/index.js';
-import authRoutes from './server/routes/authRoutes.js';
-import taskRoutes from './server/routes/taskRoutes.js';
-import { protectRoute } from './server/middlewares/authMiddlewave.js';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const { dbConnection } = require('./server/utils/index.js');
+const authRoutes = require('./server/routes/authRoutes.js');
+const taskRoutes = require('./server/routes/taskRoutes.js');
+const { protectRoute } = require('./server/middlewares/authMiddlewave.js');
 
 // Load environment variables
 dotenv.config();
