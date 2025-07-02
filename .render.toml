@@ -1,8 +1,8 @@
 [web]
 name = "task-manager-api"
 env = "node"
-startCommand = "node index.js"
-buildCommand = "npm install"
+startCommand = "cd server && npm start"
+buildCommand = "cd server && npm install"
 envVars = [
   { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" },
   { key = "PORT", value = "8800" },
@@ -13,9 +13,8 @@ envVars = [
 nodeVersion = "18"
 instanceType = "shared-cpu"
 autoDeploy = true
-root = "server"
 workingDirectory = "server"
 
 [web.build]
-command = "npm install"
+command = "cd server && npm install"
 directory = "server"
