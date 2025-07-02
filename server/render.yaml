@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: task-manager-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        fromRenderSecrets: true
+      - key: PORT
+        value: "3000"
+    instanceType: shared-cpu
+    autoDeploy: true
+    healthCheckPath: /api/health
+
+  - type: static
+    name: task-manager-frontend
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run preview
+    instanceType: shared-cpu
+    autoDeploy: true
