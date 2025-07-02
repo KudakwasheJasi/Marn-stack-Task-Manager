@@ -4,7 +4,7 @@ env = "node"
 startCommand = "cd server && node index.js"
 buildCommand = "cd server && npm install"
 envVars = [
-  { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/taskmanager?retryWrites=true&w=majority" },
+  { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" },
   { key = "PORT", value = "8800" },
   { key = "JWT_SECRET", value = "kjewhuhewhugheygy" }
 ]
