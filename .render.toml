@@ -1,7 +1,7 @@
 [web]
 name = "task-manager-api"
 env = "node"
-startCommand = "npm start"
+startCommand = "node index.js"
 buildCommand = "npm install"
 envVars = [
   { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" },
