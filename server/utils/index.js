@@ -8,7 +8,11 @@ dotenv.config()
 
 export const dbConnection = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    if (!mongoUri) {
+      throw new Error('MongoDB URI is not defined in environment variables');
+    }
+    await mongoose.connect(mongoUri);
 
     console.log("DB connection established");
   } catch (error) {
