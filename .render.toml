@@ -11,9 +11,9 @@ envVars = [
 nodeVersion = "18"
 instanceType = "shared-cpu"
 autoDeploy = true
-root = "./opt/render/project/server"
-workingDirectory = "./opt/render/project/server"
+root = "server"
+workingDirectory = "server"
 
 [web.build]
 command = "npm install"
-directory = "./opt/render/project/server"
+directory = "server"
