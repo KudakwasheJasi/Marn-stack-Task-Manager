@@ -1,8 +1,8 @@
 [web]
 name = "task-manager-api"
 env = "node"
-startCommand = "cd server && node index.js"
-buildCommand = "cd server && npm install"
+startCommand = "node index.js"
+buildCommand = "npm install"
 envVars = [
   { key = "MONGODB_URI", value = "mongodb+srv://jasikudakwashe42:XSsVs9VzDlBqkzzT@cluster0.rksmdnu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" },
   { key = "PORT", value = "8800" },
@@ -14,5 +14,5 @@ autoDeploy = true
 workingDirectory = "server"
 
 [web.build]
-command = "cd server && npm install"
+command = "npm install"
 directory = "server"
