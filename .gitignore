@@ -1,1 +1,20 @@
+<<<<<<< HEAD
 .vercel
+=======
+node_modules/
+.env
+.env.*
+.DS_Store
+*.log
+coverage/
+dist/
+build/
+*.pem
+*.key
+*.crt
+.idea/
+.vscode/
+*.swp
+*.swo
+npm-debug.log*
+>>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929

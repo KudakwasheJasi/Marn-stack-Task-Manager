@@ -11,4 +11,9 @@ envVars = [
 nodeVersion = "18"
 instanceType = "shared-cpu"
 autoDeploy = true
+<<<<<<< HEAD
 root = "server"
+=======
+root = "."
+workingDirectory = "/opt/render/project/src"
+>>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929

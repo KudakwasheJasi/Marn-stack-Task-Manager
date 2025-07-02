@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
     * @description      : 
     * @author           : kudakwashe Ellijah
@@ -17,6 +18,16 @@ import { dbConnection } from './utils/index.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
+=======
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import { dbConnection } from './server/utils/index.js';
+import authRoutes from './server/routes/authRoutes.js';
+import taskRoutes from './server/routes/taskRoutes.js';
+import { protectRoute } from './server/middlewares/authMiddlewave.js';
+>>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929
 
 // Load environment variables
 dotenv.config();
