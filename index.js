@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
     * @description      : 
     * @author           : kudakwashe Ellijah
@@ -9,7 +8,7 @@
     * - Version         : 1.0.0
     * - Date            : 02/07/2025
     * - Author          : kudakwashe Ellijah
-    * - Modification    : 
+    * - Modification    : Update import paths to use correct relative paths
 **/
 import express from 'express';
 import cors from 'cors';
@@ -18,16 +17,6 @@ import { dbConnection } from './utils/index.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
-=======
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import { dbConnection } from './server/utils/index.js';
-import authRoutes from './server/routes/authRoutes.js';
-import taskRoutes from './server/routes/taskRoutes.js';
-import { protectRoute } from './server/middlewares/authMiddlewave.js';
->>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929
 
 // Load environment variables
 dotenv.config();
@@ -37,7 +26,12 @@ const port = process.env.PORT || 5000; // Changed to 8000 to match client config
 
 // Enhanced CORS configuration
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:3001', // <-- add this line
+        'https://your-vercel-app.vercel.app' // <-- add your production frontend URL
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
