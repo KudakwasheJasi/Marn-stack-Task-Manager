@@ -1,24 +1,13 @@
 {
-<<<<<<< HEAD
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-=======
   "name": "task-manager-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Task Manager API",
   "type": "module",
->>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-<<<<<<< HEAD
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "render deploy --env node --name task-manager-api --start-command \"npm start\" --build-command \"npm install\" --env-vars MONGODB_URI=$MONGODB_URI,PORT=3000"
-=======
     "test": "echo \"Error: no test specified\" && exit 1"
->>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929
   },
   "author": "",
   "license": "ISC",
@@ -29,14 +18,9 @@
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "jsonwebtoken": "^9.0.2",
-<<<<<<< HEAD
-    "mongoose": "^8.2.1",
-    "morgan": "^1.10.0"
+    "mongoose": "^7.6.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
-=======
-    "mongoose": "^7.6.3"
->>>>>>> 8632ebc47b29a9cc52ef3a53168c234f5066a929
   }
 }
