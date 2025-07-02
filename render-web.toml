@@ -8,6 +8,7 @@ envVars = [
   { key = "PORT", value = "8800" },
   { key = "JWT_SECRET", value = "kjewhuhewhugheygy" }
 ]
+nodeVersion = "18"
 instanceType = "shared-cpu"
 autoDeploy = true
 root = "server"
