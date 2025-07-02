@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 02/07/2025 - 07:32:43
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 02/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
