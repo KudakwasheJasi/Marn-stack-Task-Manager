@@ -80,6 +80,20 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/api', (req, res) => {
+    res.json({
+        status: 'success',
+        message: 'API is running',
+        endpoints: {
+            auth: '/api/auth',
+            tasks: '/api/tasks',
+            users: '/api/users',
+            health: '/api/health'
+        },
+        version: process.env.npm_package_version || '1.0.0'
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.status(200).json({ 
