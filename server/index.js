@@ -45,6 +45,7 @@ app.use(cors({
         'http://localhost:5173',
         'http://localhost:3001',
         'https://marn-stack-task-manager.vercel.app',
+        'https://marn-stack-task-manager-raqp4pjm5-kudakwashejasis-projects.vercel.app',
         'https://taskmanager-api.onrender.com'
     ],
     credentials: true,
@@ -194,32 +195,36 @@ const startServer = async () => {
         // Start server
         const server = app.listen(port, () => {
             console.log(`
-==========================================
 🚀 Server is running on port ${port}
 📱 API: http://localhost:${port}/api
-🔐 Auth Routes: http://localhost:${port}/api/auth
-📋 Task Routes: http://localhost:${port}/api/tasks
-🏥 Health Check: http://localhost:${port}/api/health
-==========================================
+...(running on ${process.env.NODE_ENV || 'development'} environment)
             `);
         });
-
-        // Handle server errors
+        
         server.on('error', (error) => {
             console.error('Server error:', error);
             process.exit(1);
         });
-
+        
         // Handle unhandled rejections
         process.on('unhandledRejection', (error) => {
             console.error('Unhandled rejection:', error);
             process.exit(1);
         });
-
+        
         // Handle uncaught exceptions
         process.on('uncaughtException', (error) => {
             console.error('Uncaught exception:', error);
             process.exit(1);
+        });
+        
+        // Handle SIGTERM (for graceful shutdown)
+        process.on('SIGTERM', () => {
+            console.log('SIGTERM received. Shutting down...');
+            server.close(() => {
+                console.log('Server closed');
+                process.exit(0);
+            });
         });
     } catch (error) {
         console.error('Failed to start server:', {
