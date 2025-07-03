@@ -54,19 +54,23 @@ app.use((req, res, next) => {
 
 app.use(cors({
     origin: (origin, callback) => {
-        const allowedOrigins = [
-            'http://localhost:3000',
-            'https://marn-stack-task-manager.onrender.com',
-            'https://marn-stack-task-manager.vercel.app'
-        ];
-        
+        // Always allow requests from undefined origin (typically from Vercel)
         if (!origin) {
             console.log('CORS request from undefined origin - allowing');
             callback(null, true);
             return;
         }
-        
-        if (allowedOrigins.includes(origin)) {
+
+        // Parse origin to handle subdomains
+        const originHost = new URL(origin).hostname;
+        const allowedOrigins = [
+            'localhost:3000',
+            'marn-stack-task-manager.onrender.com',
+            'marn-stack-task-manager.vercel.app'
+        ];
+
+        // Check if origin is allowed
+        if (allowedOrigins.some(allowed => originHost === allowed)) {
             console.log('CORS request from allowed origin:', origin);
             callback(null, true);
         } else {
