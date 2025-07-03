@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8800',  // Make sure this matches your server PORT
+    baseURL: 'https://task-manager-api.onrender.com',  // Update to your deployed server URL
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
