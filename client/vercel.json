@@ -13,6 +13,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
+    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com"
   }
 }

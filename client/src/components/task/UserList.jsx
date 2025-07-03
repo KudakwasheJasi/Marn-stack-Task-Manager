@@ -15,7 +15,7 @@ const UserList = ({ setTeam, team, disabled = false, error }) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8800/api/users');
+      const response = await fetch(`${API_URL}/users`);
       const data = await response.json();
       
       if (Array.isArray(data)) {
