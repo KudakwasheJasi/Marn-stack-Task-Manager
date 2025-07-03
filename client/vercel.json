@@ -11,25 +11,23 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
   "env": {
-    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
+    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com"
   },
   "build": {
     "command": "npm run build",
-    "output": "dist",
-    "env": {
-      "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
-    }
+    "output": "dist"
   },
   "preview": {
     "command": "npm run dev",
-    "port": 3000,
-    "env": {
-      "VITE_API_URL": "http://localhost:8800/api"
-    }
+    "port": 3000
   }
 }
