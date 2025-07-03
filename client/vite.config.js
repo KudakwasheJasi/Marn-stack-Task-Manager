@@ -5,14 +5,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: "dist",
-    assetsDir: "assets",
-    emptyOutDir: true,
-    manifest: true,
-    rollupOptions: {
-      input: {
-        main: "index.html"
-      }
-    }
+    emptyOutDir: true
   },
   server: {
     port: 3000,
