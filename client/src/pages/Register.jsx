@@ -103,7 +103,15 @@ const Register = () => {
                 label="Username"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("name", {
-                  required: "Username is required"
+                  required: "Username is required",
+                  minLength: {
+                    value: 2,
+                    message: "Username must be at least 2 characters"
+                  },
+                  pattern: {
+                    value: /^[A-Za-z\s]*$/,
+                    message: "Username can only contain letters and spaces"
+                  }
                 })}
                 error={errors.name?.message}
                 disabled={loading}
@@ -133,7 +141,15 @@ const Register = () => {
                 label="Password"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("password", {
-                  required: "Password is required"
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters"
+                  },
+                  pattern: {
+                    value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/,
+                    message: "Password must contain at least one letter and one number"
+                  }
                 })}
                 error={errors.password?.message}
                 disabled={loading}
@@ -147,8 +163,7 @@ const Register = () => {
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("confirmPassword", {
                   required: "Please confirm your password",
-                  validate: value => 
-                    value === password || "Passwords do not match"
+                  validate: value => value === password || "Passwords don't match"
                 })}
                 error={errors.confirmPassword?.message}
                 disabled={loading}
