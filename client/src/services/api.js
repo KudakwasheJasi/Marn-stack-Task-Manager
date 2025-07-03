@@ -8,11 +8,11 @@
     * - Version         : 1.0.0
     * - Date            : 03/07/2025
     * - Author          : kudakwashe Ellijah
-    * - Modification    : 
+    * - Modification    : Updated API configuration to handle routes correctly
 **/
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800';
 
 const API = axios.create({
     baseURL: BASE_URL,
