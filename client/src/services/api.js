@@ -28,7 +28,7 @@ const checkServerHealth = async () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await API.get('/health', {
+        const response = await API.get('/api/health', {
             signal: controller.signal
         });
 

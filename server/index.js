@@ -106,12 +106,33 @@ const corsMiddleware = (req, res, next) => {
 // Apply middleware
 app.use(corsMiddleware);
 
-// Health check endpoint
+// Health check endpoints
 app.get('/health', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.status(200).json({ status: 'ok' });
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.status(200).json({ 
+        status: 'ok',
+        timestamp: new Date(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV,
+        version: process.env.npm_package_version || '1.0.0'
+    });
+});
+
+app.get('/api/health', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.status(200).json({ 
+        status: 'ok',
+        timestamp: new Date(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV,
+        version: process.env.npm_package_version || '1.0.0'
+    });
 });
 
 const __filename = fileURLToPath(import.meta.url);
