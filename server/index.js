@@ -65,22 +65,28 @@ app.use((req, res, next) => {
     next();
 });
 
+// Root path handler
+app.get('/', (req, res) => {
+    res.json({
+        status: 'success',
+        message: 'API is running',
+        endpoints: {
+            auth: '/api/auth',
+            tasks: '/api/tasks',
+            users: '/api/users',
+            health: '/api/health'
+        },
+        version: process.env.npm_package_version || '1.0.0'
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.status(200).json({ 
         status: 'ok',
         timestamp: new Date(),
-        uptime: process.uptime()
-    });
-});
-
-// Test route with enhanced response
-app.get('/api/test', (req, res) => {
-    res.json({
-        status: true,
-        message: 'Server is running',
+        uptime: process.uptime(),
         environment: process.env.NODE_ENV,
-        timestamp: new Date(),
         version: process.env.npm_package_version || '1.0.0'
     });
 });
@@ -89,6 +95,16 @@ app.get('/api/test', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
 app.use('/api/users', userRoutes);
+
+// 404 handler for non-existent routes
+app.use((req, res) => {
+    res.status(404).json({
+        status: 'error',
+        message: 'Endpoint not found',
+        timestamp: new Date(),
+        path: req.path
+    });
+});
 
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
