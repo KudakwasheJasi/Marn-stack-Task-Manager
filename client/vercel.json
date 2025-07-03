@@ -9,24 +9,27 @@
       }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "env": {
-    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com"
+    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
   },
   "build": {
     "command": "npm run build",
-    "output": "dist"
+    "output": "dist",
+    "env": {
+      "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
+    }
   },
   "preview": {
     "command": "npm run dev",
     "port": 3000,
     "env": {
-      "VITE_API_URL": "http://localhost:8800"
+      "VITE_API_URL": "http://localhost:8800/api"
     }
   }
 }
