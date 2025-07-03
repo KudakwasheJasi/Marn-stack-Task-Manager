@@ -17,5 +17,16 @@
   ],
   "env": {
     "VITE_API_URL": "https://marn-stack-task-manager.onrender.com"
+  },
+  "build": {
+    "command": "npm run build",
+    "output": "dist"
+  },
+  "preview": {
+    "command": "npm run dev",
+    "port": 3000,
+    "env": {
+      "VITE_API_URL": "http://localhost:8800"
+    }
   }
 }
