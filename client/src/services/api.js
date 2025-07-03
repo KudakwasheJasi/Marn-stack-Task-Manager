@@ -13,11 +13,14 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8800/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 60000,
     headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Accept': 'application/json'
     }
 });
@@ -28,9 +31,7 @@ const checkServerHealth = async () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await fetch(`${BASE_URL}/health`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+        const response = await API.get('/health', {
             signal: controller.signal
         });
 
@@ -40,7 +41,7 @@ const checkServerHealth = async () => {
             throw new Error(`Health check failed: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.data;
         return data.status === 'ok';
     } catch (error) {
         console.error('Health check error:', error);

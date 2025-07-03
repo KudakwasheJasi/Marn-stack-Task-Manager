@@ -38,28 +38,18 @@ app.use('/api', (req, res, next) => {
     next();
 });
 
-// Enhanced CORS configuration
-// CORS middleware with detailed logging
-app.use((req, res, next) => {
-    console.log('Request:', {
-        method: req.method,
-        url: req.url,
-        origin: req.headers.origin,
-        headers: Object.keys(req.headers).length > 0 ? Object.fromEntries(
-            Object.entries(req.headers).filter(([key]) => key.toLowerCase() !== 'authorization')
-        ) : {}
-    });
-    next();
-});
+// Middleware configuration
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Custom CORS middleware for health check and other endpoints
+// Custom CORS middleware
 const corsMiddleware = (req, res, next) => {
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
         res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
-        res.header('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+        res.header('Access-Control-Max-Age', '86400');
         return res.status(204).send('');
     }
 
@@ -107,21 +97,12 @@ const corsMiddleware = (req, res, next) => {
     } catch (error) {
         console.error('CORS middleware error:', error);
         res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
         res.status(400).json({ error: 'Invalid origin' });
     }
 };
 
-// Apply CORS middleware
+// Apply middleware
 app.use(corsMiddleware);
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -130,6 +111,10 @@ app.get('/health', (req, res) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     res.status(200).json({ status: 'ok' });
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Mount routes with API prefix
 app.use('/api/auth', authRoutes);
@@ -197,7 +182,7 @@ app.use((req, res) => {
     });
 });
 
-// Enhanced error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', {
         message: err.message,
@@ -207,7 +192,7 @@ app.use((err, req, res, next) => {
         method: req.method
     });
 
-    const statusCode = err.statusCode || 8800;
+    const statusCode = err.statusCode || 500;
     res.status(statusCode).json({
         status: false,
         message: err.message || 'Something went wrong!',
@@ -218,30 +203,24 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler with more details
+// 404 handler
 app.use((req, res) => {
-    console.error('404 Error:', {
-        path: req.path,
-        method: req.method,
-        timestamp: new Date()
-    });
-    
     res.status(404).json({
-        status: false,
-        message: 'Route not found',
-        path: req.path,
-        method: req.method,
-        timestamp: new Date()
+        status: 'error',
+        message: 'Endpoint not found',
+        timestamp: new Date(),
+        path: req.path
     });
 });
 
-// Enhanced global error handlers
+// Global error handlers
 process.on('unhandledRejection', (error, promise) => {
     console.error('Unhandled Rejection:', {
         error: error,
         promise: promise,
         timestamp: new Date()
     });
+    process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
@@ -249,13 +228,10 @@ process.on('uncaughtException', (error) => {
         error: error,
         timestamp: new Date()
     });
-    // Give the server time to send any pending responses before exiting
-    setTimeout(() => {
-        process.exit(1);
-    }, 1000);
+    process.exit(1);
 });
 
-// Database connection and server startup with enhanced error handling
+// Database connection and server startup
 const startServer = async () => {
     try {
         // Connect to database
@@ -279,18 +255,6 @@ const startServer = async () => {
             console.error('Server error:', error);
             process.exit(1);
         });
-
-        // Handle unhandled rejections
-        process.on('unhandledRejection', (error) => {
-            console.error('Unhandled rejection:', error);
-            process.exit(1);
-        });
-
-        // Handle uncaught exceptions
-        process.on('uncaughtException', (error) => {
-            console.error('Uncaught exception:', error);
-            process.exit(1);
-        });
     } catch (error) {
         console.error('Failed to start server:', {
             error: error,
@@ -304,9 +268,7 @@ const startServer = async () => {
 const shutdown = async (signal) => {
     console.log(`\n${signal} received. Starting graceful shutdown...`);
     
-    // Add any cleanup operations here (close database connections, etc.)
     try {
-        // Give server time to finish pending requests
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log('Shutting down server...');
         process.exit(0);
@@ -316,11 +278,9 @@ const shutdown = async (signal) => {
     }
 };
 
-// Handle different termination signals
+// Handle termination signals
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
 // Start the server
 startServer();
-
-export default app;
