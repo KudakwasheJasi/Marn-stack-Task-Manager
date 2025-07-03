@@ -6,13 +6,14 @@
       "use": "@vercel/static-build"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "https://marn-stack-task-manager.onrender.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
-  }
+  ]
 }

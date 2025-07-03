@@ -12,14 +12,13 @@
 **/
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800';
-
 const API = axios.create({
-    baseURL: BASE_URL,
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8800/api',
     withCredentials: true,
-    timeout: 8000,
+    timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
     }
 });
 
