@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://marn-stack-task-manager.onrender.com/api',  // Update to your deployed server URL with /api prefix
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8800/api',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
