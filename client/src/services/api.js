@@ -18,8 +18,7 @@ const API = axios.create({
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': import.meta.env.VITE_API_URL || 'http://localhost:8800/api'
+        'Accept': 'application/json'
     }
 });
 

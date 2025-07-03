@@ -14,33 +14,10 @@ export const dbConnection = async () => {
       throw new Error('MongoDB URI is not defined in environment variables');
     }
     
-    // Log the connection attempt
-    console.log('Attempting to connect to MongoDB...');
+    // Log the URI (without credentials for security)
+    console.log('Connecting to MongoDB...');
     
-    // Connect to MongoDB with retry logic
-    const retryCount = 3;
-    const retryDelay = 5000; // 5 seconds
-    
-    for (let i = 0; i < retryCount; i++) {
-      try {
-        await mongoose.connect(mongoUri, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          serverSelectionTimeoutMS: 5000,
-          socketTimeoutMS: 45000,
-          keepAlive: true,
-          connectTimeoutMS: 30000
-        });
-        console.log('Successfully connected to MongoDB');
-        return;
-      } catch (error) {
-        if (i === retryCount - 1) {
-          throw error;
-        }
-        console.log(`Connection attempt ${i + 1} failed, retrying in ${retryDelay/1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
-      }
-    }
+    // Connect to MongoDB
     await mongoose.connect(mongoUri);
     
     console.log("DB connection established");
