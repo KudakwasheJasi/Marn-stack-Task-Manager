@@ -39,19 +39,30 @@ app.use('/api', (req, res, next) => {
 });
 
 // Enhanced CORS configuration
+// CORS middleware with detailed logging
+app.use((req, res, next) => {
+    console.log('Request:', {
+        method: req.method,
+        url: req.url,
+        origin: req.headers.origin,
+        headers: Object.keys(req.headers).length > 0 ? Object.fromEntries(
+            Object.entries(req.headers).filter(([key]) => key.toLowerCase() !== 'authorization')
+        ) : {}
+    });
+    next();
+});
+
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'http://localhost:3001',
-        'https://marn-stack-task-manager.vercel.app',
-        'https://taskmanager-api.onrender.com'
-    ],
+    origin: (origin, callback) => {
+        console.log('CORS request from:', origin);
+        callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
     exposedHeaders: ['Content-Length', 'X-Total-Count'],
-    maxAge: 600 // Cache preflight requests for 10 minutes
+    maxAge: 600, // Cache preflight requests for 10 minutes
+    optionsSuccessStatus: 204
 }));
 
 // Middleware
