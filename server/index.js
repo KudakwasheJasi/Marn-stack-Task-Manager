@@ -57,7 +57,7 @@ app.use(cors({
         const allowedOrigins = [
             'http://localhost:3000',
             'https://marn-stack-task-manager.onrender.com',
-            'https://task-manager-frontend-kudakwashe.vercel.app'
+            'https://marn-stack-task-manager.vercel.app'
         ];
         
         if (!origin) {
