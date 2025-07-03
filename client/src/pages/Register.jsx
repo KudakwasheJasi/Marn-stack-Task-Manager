@@ -41,6 +41,12 @@ const Register = () => {
         password: data.password
       };
 
+      // Validate form data
+      if (!userData.name || !userData.email || !userData.password) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
       // Check if passwords match
       if (data.password !== data.confirmPassword) {
         toast.error("Passwords don't match!");
@@ -49,11 +55,13 @@ const Register = () => {
 
       // Attempt to register the user
       const response = await registerUser(userData);
-
-      if (response) {
+      
+      if (response?.status) {
         toast.success('Registration successful! Please login to continue.');
         reset();
         navigate('/log-in');
+      } else {
+        throw new Error(response?.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -103,35 +111,42 @@ const Register = () => {
                 label="Username"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("name", {
+                  required: "Username is required",
                   minLength: {
                     value: 2,
                     message: "Name must be at least 2 characters long"
                   }
                 })}
+                error={errors.name?.message}
                 autocomplete="name"
                 disabled={loading}
               />
 
               <Textbox
                 type="email"
+                name="email"
                 placeholder="Email Address"
                 label="Email Address"
-                {...register("email", {
+                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
+                register={register("email", {
                   required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: "Invalid email address"
                   }
                 })}
+                error={errors.email?.message}
                 autocomplete="email"
                 disabled={loading}
               />
 
               <Textbox
                 type="password"
+                name="password"
                 placeholder="Password"
                 label="Password"
-                {...register("password", {
+                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
+                register={register("password", {
                   required: "Password is required",
                   minLength: {
                     value: 6,
@@ -142,8 +157,8 @@ const Register = () => {
                     message: "Password must contain at least one letter and one number"
                   }
                 })}
-                autocomplete="new-password"
                 error={errors.password?.message}
+                autocomplete="new-password"
                 disabled={loading}
               />
 
