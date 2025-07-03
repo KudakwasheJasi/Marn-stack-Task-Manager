@@ -54,8 +54,25 @@ app.use((req, res, next) => {
 
 app.use(cors({
     origin: (origin, callback) => {
-        console.log('CORS request from:', origin);
-        callback(null, true);
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'https://marn-stack-task-manager.onrender.com',
+            'https://task-manager-frontend-kudakwashe.vercel.app'
+        ];
+        
+        if (!origin) {
+            console.log('CORS request from undefined origin - allowing');
+            callback(null, true);
+            return;
+        }
+        
+        if (allowedOrigins.includes(origin)) {
+            console.log('CORS request from allowed origin:', origin);
+            callback(null, true);
+        } else {
+            console.log('CORS request from blocked origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

@@ -17,8 +17,14 @@ export const dbConnection = async () => {
     // Log the URI (without credentials for security)
     console.log('Connecting to MongoDB...');
     
-    // Connect to MongoDB
-    await mongoose.connect(mongoUri);
+    // Connect to MongoDB with retry options
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+      retryWrites: true,
+      w: 'majority',
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 45000
+    });
     
     console.log("DB connection established");
   } catch (error) {
