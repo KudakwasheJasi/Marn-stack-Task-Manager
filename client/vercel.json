@@ -3,12 +3,7 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist",
-        "installCommand": "npm install",
-        "buildCommand": "npm run build"
-      }
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
@@ -17,15 +12,11 @@
       "dest": "https://marn-stack-task-manager.onrender.com/api/$1"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|gif|svg|ico|html|json|map))",
-      "dest": "/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
   "env": {
-    "VITE_API_URL": "${VITE_API_URL}"
+    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
   }
 }
