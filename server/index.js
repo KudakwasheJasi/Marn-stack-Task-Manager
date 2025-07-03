@@ -13,24 +13,32 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { dbConnection } from './utils/index.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000; // Changed to 8000 to match client config
+const port = process.env.PORT || 8800;
+
+// Mount API routes with prefix
+app.use('/api', (req, res, next) => {
+    next();
+});
 
 // Enhanced CORS configuration
 app.use(cors({
     origin: [
         'http://localhost:3000',
         'http://localhost:5173',
-        'http://localhost:3001', // <-- add this line
-        'https://your-vercel-app.vercel.app' // <-- add your production frontend URL
+        'http://localhost:3001',
+        'https://client-gamma-lac.vercel.app' // Your Vercel deployment URL
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -42,6 +50,14 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Mount routes with API prefix
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -72,6 +88,7 @@ app.get('/api/test', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
+app.use('/api/users', userRoutes);
 
 // Enhanced error handling middleware
 app.use((err, req, res, next) => {
@@ -96,6 +113,12 @@ app.use((err, req, res, next) => {
 
 // 404 handler with more details
 app.use((req, res) => {
+    console.error('404 Error:', {
+        path: req.path,
+        method: req.method,
+        timestamp: new Date()
+    });
+    
     res.status(404).json({
         status: false,
         message: 'Route not found',
