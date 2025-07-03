@@ -70,7 +70,7 @@ app.use(cors({
         ];
 
         // Check if origin is allowed
-        if (allowedOrigins.some(allowed => originHost === allowed)) {
+        if (allowedOrigins.includes(originHost)) {
             console.log('CORS request from allowed origin:', origin);
             callback(null, true);
         } else {
