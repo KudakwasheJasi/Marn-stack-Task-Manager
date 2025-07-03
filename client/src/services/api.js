@@ -1,6 +1,18 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 03/07/2025 - 17:57:45
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 03/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8800/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800/api';
 
 const API = axios.create({
     baseURL: BASE_URL,
@@ -71,11 +83,10 @@ const updateTask = async (taskId, taskData) => {
     }
 };
 
-// Modified deleteTask function
 const deleteTask = async (taskId) => {
     try {
         console.log('Deleting task:', taskId);
-        const response = await API.delete(`/tasks/${taskId}`); // Ensure this URL is correct
+        const response = await API.delete(`/tasks/${taskId}`);
         console.log('Task deleted successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -138,11 +149,10 @@ const logout = async () => {
     }
 };
 
-// New user management functions
 const addUser = async (userData) => {
     try {
         console.log('Adding user...', userData);
-        const response = await API.post('/users', userData); // Adjust the endpoint as necessary
+        const response = await API.post('/users', userData);
         console.log('User added successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -153,7 +163,7 @@ const addUser = async (userData) => {
 const updateUser = async (userId, userData) => {
     try {
         console.log('Updating user:', userId, userData);
-        const response = await API.put(`/users/${userId}`, userData); // Adjust the endpoint as necessary
+        const response = await API.put(`/users/${userId}`, userData);
         console.log('User updated successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -265,5 +275,3 @@ export {
     addUser,
     updateUser
 };
-
-export default API;
