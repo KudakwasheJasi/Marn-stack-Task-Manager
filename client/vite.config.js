@@ -3,17 +3,9 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/",
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: true,
-    rollupOptions: {
-      input: {
-        main: "index.html"
-      }
-    },
-    manifest: true,
     emptyOutDir: true
   },
   server: {
@@ -21,8 +13,8 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: process.env.VITE_API_URL || "http://localhost:8800",
-        changeOrigin: true,
-      },
-    },
-  },
+        changeOrigin: true
+      }
+    }
+  }
 });
