@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   base: "/",
@@ -11,16 +10,17 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: "index.html",
-      },
+        main: "index.html"
+      }
     },
+    manifest: true,
+    emptyOutDir: true
   },
-
   server: {
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:8800",
+        target: process.env.VITE_API_URL || "http://localhost:8800",
         changeOrigin: true,
       },
     },
