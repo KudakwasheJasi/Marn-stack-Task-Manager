@@ -2,11 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist",
+      "src": "package.json",
       "use": "@vercel/static-build"
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://marn-stack-task-manager.onrender.com/api/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|gif|svg|ico|html|json|map))",
+      "dest": "/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
