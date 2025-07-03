@@ -52,16 +52,26 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(cors({
-    origin: (origin, callback) => {
-        // Always allow requests from undefined origin (typically from Vercel)
-        if (!origin) {
-            console.log('CORS request from undefined origin - allowing');
-            callback(null, true);
-            return;
-        }
+// Custom CORS middleware for health check and other endpoints
+const corsMiddleware = (req, res, next) => {
+    // Always allow health check requests
+    if (req.path === '/health') {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+        return next();
+    }
 
-        // Parse origin to handle subdomains
+    // Handle other CORS requests
+    const origin = req.headers.origin;
+    if (!origin) {
+        console.log('CORS request from undefined origin - allowing');
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        return next();
+    }
+
+    try {
         const originHost = new URL(origin).hostname;
         const allowedOrigins = [
             'localhost:3000',
@@ -69,32 +79,27 @@ app.use(cors({
             'marn-stack-task-manager.vercel.app'
         ];
 
-        // Check if origin is allowed
         if (allowedOrigins.includes(originHost)) {
             console.log('CORS request from allowed origin:', origin);
-            callback(null, true);
+            res.header('Access-Control-Allow-Origin', origin);
+            res.header('Access-Control-Allow-Credentials', 'true');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
+            res.header('Access-Control-Expose-Headers', 'Content-Length, X-Total-Count, Authorization');
+            res.header('Vary', 'Origin');
+            return next();
         } else {
             console.log('CORS request from blocked origin:', origin);
-            callback(new Error('Not allowed by CORS'));
+            res.status(403).json({ error: 'Not allowed by CORS' });
         }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
-    exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
-    maxAge: 600, // Cache preflight requests for 10 minutes
-    optionsSuccessStatus: 204,
-    vary: true
-}));
+    } catch (error) {
+        console.error('CORS middleware error:', error);
+        res.status(400).json({ error: 'Invalid origin' });
+    }
+};
 
-// Add additional CORS headers for all responses
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
-    next();
-});
+// Apply CORS middleware
+app.use(corsMiddleware);
 
 // Middleware
 app.use(express.json());
@@ -102,6 +107,11 @@ app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
 
 // Mount routes with API prefix
 app.use('/api/auth', authRoutes);
