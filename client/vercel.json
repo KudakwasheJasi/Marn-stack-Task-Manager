@@ -21,9 +21,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "${VITE_API_URL}"
-  },
-  "buildEnv": {
     "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
   }
 }
