@@ -25,9 +25,5 @@
   "build": {
     "command": "npm run build",
     "output": "dist"
-  },
-  "preview": {
-    "command": "npm run dev",
-    "port": 3000
   }
 }
