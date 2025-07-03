@@ -12,11 +12,18 @@
       "dest": "https://marn-stack-task-manager.onrender.com/api/$1"
     },
     {
+      "src": "/(.*\\.(js|css|png|jpg|gif|svg|ico|html|json|map))",
+      "dest": "/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
   "env": {
+    "VITE_API_URL": "${VITE_API_URL}"
+  },
+  "buildEnv": {
     "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
   }
 }
