@@ -54,6 +54,15 @@ app.use((req, res, next) => {
 
 // Custom CORS middleware for health check and other endpoints
 const corsMiddleware = (req, res, next) => {
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
+        res.header('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+        return res.status(204).send('');
+    }
+
     // Always allow health check requests
     if (req.path === '/health') {
         res.header('Access-Control-Allow-Origin', '*');
@@ -90,10 +99,16 @@ const corsMiddleware = (req, res, next) => {
             return next();
         } else {
             console.log('CORS request from blocked origin:', origin);
+            res.header('Access-Control-Allow-Origin', origin);
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
             res.status(403).json({ error: 'Not allowed by CORS' });
         }
     } catch (error) {
         console.error('CORS middleware error:', error);
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
         res.status(400).json({ error: 'Invalid origin' });
     }
 };
@@ -110,6 +125,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
     res.status(200).json({ status: 'ok' });
 });
 
