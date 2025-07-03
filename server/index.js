@@ -49,6 +49,7 @@ const corsMiddleware = (req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
         res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
+        res.header('Access-Control-Allow-Credentials', 'true');
         res.header('Access-Control-Max-Age', '86400');
         return res.status(204).send('');
     }
@@ -97,6 +98,7 @@ const corsMiddleware = (req, res, next) => {
     } catch (error) {
         console.error('CORS middleware error:', error);
         res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Credentials', 'true');
         res.status(400).json({ error: 'Invalid origin' });
     }
 };
