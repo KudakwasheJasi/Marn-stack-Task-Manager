@@ -17,22 +17,18 @@ export const dbConnection = async () => {
     // Log the URI (without credentials for security)
     console.log('Connecting to MongoDB...');
     
-    // Connect to MongoDB with retry options
+    // Connect to MongoDB with optimized settings
     await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       retryWrites: true,
       w: 'majority',
       socketTimeoutMS: 45000,
       connectTimeoutMS: 45000,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       minPoolSize: 1,
       maxPoolSize: 10,
-      waitQueueTimeoutMS: 30000,
-      heartbeatFrequencyMS: 10000,
-      serverSelectionTimeoutMS: 30000,
-      keepAlive: true,
-      keepAliveInitialDelay: 300000
+      waitQueueTimeoutMS: 30000
     });
     
     console.log("DB connection established");
