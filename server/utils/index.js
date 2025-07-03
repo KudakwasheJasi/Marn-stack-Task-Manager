@@ -23,7 +23,9 @@ export const dbConnection = async () => {
       retryWrites: true,
       w: 'majority',
       socketTimeoutMS: 45000,
-      connectTimeoutMS: 45000
+      connectTimeoutMS: 45000,
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     });
     
     console.log("DB connection established");

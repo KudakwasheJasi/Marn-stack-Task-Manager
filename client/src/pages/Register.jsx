@@ -103,54 +103,46 @@ const Register = () => {
                 label="Username"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("name", {
-                  required: "Username is required",
                   minLength: {
                     value: 2,
-                    message: "Username must be at least 2 characters"
-                  },
-                  pattern: {
-                    value: /^[A-Za-z\s]*$/,
-                    message: "Username can only contain letters and spaces"
+                    message: "Name must be at least 2 characters long"
                   }
                 })}
-                error={errors.name?.message}
+                autocomplete="name"
                 disabled={loading}
               />
 
               <Textbox
                 type="email"
-                name="email"
-                placeholder="email@example.com"
+                placeholder="Email Address"
                 label="Email Address"
-                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
-                register={register("email", {
+                {...register("email", {
                   required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: "Invalid email address"
                   }
                 })}
-                error={errors.email?.message}
+                autocomplete="email"
                 disabled={loading}
               />
 
               <Textbox
                 type="password"
-                name="password"
-                placeholder="Enter password"
+                placeholder="Password"
                 label="Password"
-                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
-                register={register("password", {
+                {...register("password", {
                   required: "Password is required",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters"
+                    message: "Password must be at least 6 characters long"
                   },
                   pattern: {
                     value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/,
                     message: "Password must contain at least one letter and one number"
                   }
                 })}
+                autocomplete="new-password"
                 error={errors.password?.message}
                 disabled={loading}
               />
