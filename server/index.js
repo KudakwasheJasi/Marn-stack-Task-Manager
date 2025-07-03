@@ -27,6 +27,12 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 8800;
 
+// Ensure environment variables are set
+if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET environment variable is not set!');
+    process.exit(1);
+}
+
 // Mount API routes with prefix
 app.use('/api', (req, res, next) => {
     next();
@@ -204,6 +210,17 @@ const startServer = async () => {
             process.exit(1);
         });
 
+        // Handle unhandled rejections
+        process.on('unhandledRejection', (error) => {
+            console.error('Unhandled rejection:', error);
+            process.exit(1);
+        });
+
+        // Handle uncaught exceptions
+        process.on('uncaughtException', (error) => {
+            console.error('Uncaught exception:', error);
+            process.exit(1);
+        });
     } catch (error) {
         console.error('Failed to start server:', {
             error: error,
