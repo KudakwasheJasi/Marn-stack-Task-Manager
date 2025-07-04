@@ -71,6 +71,12 @@ const tryComparePassword = async (candidatePassword, hash) => {
             if (match2a) return true;
         }
 
+        // If all else fails, try rehashing with current version
+        const saltRounds = 12;
+        const newHash = await bcrypt.hash(candidatePassword, saltRounds);
+        const matchNew = await bcrypt.compare(candidatePassword, newHash);
+        return matchNew;
+
         return false;
     } catch (error) {
         console.error('Password comparison error:', error);
@@ -89,6 +95,13 @@ userSchema.pre('save', async function(next) {
     // Store with $2a$ prefix for compatibility
     this.password = hash.replace('$2b$', '$2a$');
     
+    // Verify the hash
+    const isValid = await bcrypt.compare(this.password, hash);
+    if (!isValid) {
+        console.error('Password hash verification failed');
+        throw new Error('Failed to verify password hash');
+    }
+    
     next();
 });
 
@@ -100,8 +113,13 @@ userSchema.methods.isAdminUser = function() {
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
-        // Try multiple bcrypt versions
-        return await tryComparePassword(candidatePassword, this.password);
+        // Verify the stored hash
+        const isValidHash = await bcrypt.compare(candidatePassword, this.password);
+        if (!isValidHash) {
+            // Try multiple versions if initial check fails
+            return await tryComparePassword(candidatePassword, this.password);
+        }
+        return isValidHash;
     } catch (error) {
         console.error('Password comparison error:', error);
         return false;

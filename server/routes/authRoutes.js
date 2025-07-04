@@ -136,6 +136,7 @@ router.post("/login", async (req, res) => {
         }
 
         // Find user with password
+        console.log('Searching for user with email:', sanitizedEmail);
         const user = await User.findOne({ email: sanitizedEmail }).select('+password');
         
         if (!user) {
@@ -150,14 +151,32 @@ router.post("/login", async (req, res) => {
         // Compare password
         console.log('Attempting password comparison for user:', user._id);
         console.log('Stored password hash:', user.password);
+        console.log('Password hash prefix:', user.password.substring(0, 4));
         console.log('Candidate password:', password);
         
+        const startTime = Date.now();
         const passwordMatch = await user.comparePassword(password);
+        const duration = Date.now() - startTime;
+        console.log('Password comparison took:', duration, 'ms');
         console.log('Password match result:', passwordMatch);
 
         if (!passwordMatch) {
             console.log('Password comparison failed');
             console.log('Password hash prefix:', user.password.substring(0, 4));
+            console.log('Password length:', password.length);
+            console.log('Hash length:', user.password.length);
+            
+            // Try rehashing and comparing
+            try {
+                const saltRounds = 12;
+                const newHash = await bcrypt.hash(password, saltRounds);
+                console.log('New hash:', newHash);
+                const matchNew = await bcrypt.compare(password, newHash);
+                console.log('New hash match:', matchNew);
+            } catch (hashError) {
+                console.error('Hashing error:', hashError);
+            }
+
             return res.status(401).json({
                 status: false,
                 message: "Invalid email or password",
