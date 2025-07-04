@@ -217,11 +217,20 @@ export const login = async (credentials) => {
         } else {
             // Handle error cases
             const { status, message, data } = response.data || {};
-            throw new Error(data?.message || message || 'Login failed. Please check your credentials and try again.');
+            if (data?.message) {
+                throw new Error(data.message);
+            } else if (message) {
+                throw new Error(message);
+            } else {
+                throw new Error('Login failed. Please check your credentials and try again.');
+            }
         }
     } catch (error) {
         console.error('Login error:', error);
-        const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
+        let errorMessage = error.response?.data?.message;
+        if (!errorMessage) {
+            errorMessage = error.message || 'Login failed. Please try again.';
+        }
         throw new Error(errorMessage);
     }
 };

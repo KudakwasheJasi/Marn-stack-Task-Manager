@@ -105,25 +105,37 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Login route - improved error handling and response format
+// Login route - enhanced error handling and response format
 router.post("/login", async (req, res) => {
     try {
         console.log('Login attempt:', req.body); // Debug log
         const { email, password } = req.body;
 
-        if (!email || !password) {
+        // Validate email format
+        if (!email || !validateEmail(email)) {
             return res.status(400).json({
                 status: false,
-                message: "Email and password are required",
+                message: "Please provide a valid email address",
                 data: null
             });
         }
 
+        // Validate password
+        if (!password || password.length < 6) {
+            return res.status(400).json({
+                status: false,
+                message: "Password must be at least 6 characters long",
+                data: null
+            });
+        }
+
+        // Sanitize email
         const sanitizedEmail = sanitizeInput(email.toLowerCase(), true);
         console.log('Sanitized email:', sanitizedEmail); // Debug log
 
-        const user = await User.findOne({ email: sanitizedEmail });
-        console.log('User found:', user); // Debug log
+        // Find user
+        const user = await User.findOne({ email: sanitizedEmail }).select('+password');
+        console.log('User found:', user ? 'Yes' : 'No'); // Debug log
 
         if (!user) {
             return res.status(401).json({
@@ -133,6 +145,7 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        // Compare password
         const passwordMatch = await bcrypt.compare(password, user.password);
         console.log('Password match:', passwordMatch); // Debug log
 
@@ -144,6 +157,7 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        // Generate token
         const token = jwt.sign(
             { 
                 userId: user._id,
