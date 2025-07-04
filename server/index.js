@@ -41,7 +41,10 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
+  maxAge: 86400,
+  optionsSuccessStatus: 204
 };
 
 // Apply CORS middleware
