@@ -9,7 +9,6 @@ import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
 
-// Load env variables
 dotenv.config();
 
 const app = express();
@@ -27,7 +26,6 @@ const allowedOrigins = [
   'https://marn-stack-task-manager.vercel.app'
 ];
 
-// Define CORS options
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -45,14 +43,10 @@ const corsOptions = {
   exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
-  preflightContinue: true,
-  credentials: true
+  preflightContinue: true
 };
 
-// Apply CORS middleware
 app.use(cors(corsOptions));
-
-// Handle preflight OPTIONS requests
 app.options('*', cors(corsOptions));
 
 // === MIDDLEWARE ===
@@ -161,10 +155,15 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 const startServer = async () => {
   try {
     await dbConnection();
+
     const server = app.listen(port, () => {
+      const baseURL = process.env.RENDER_EXTERNAL_URL
+        ? `${process.env.RENDER_EXTERNAL_URL}/api`
+        : `http://localhost:${port}/api`;
+
       console.log(`🚀 Server running on port ${port}`);
-      console.log(`🌐 API Base: http://localhost:${port}/api`);
-      console.log(`✅ Health Check: http://localhost:${port}/api/health`);
+      console.log(`🌐 API Base: ${baseURL}`);
+      console.log(`✅ Health Check: ${baseURL}/health`);
     });
 
     server.on('error', (error) => {
