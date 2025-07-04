@@ -13,7 +13,7 @@ import TaskDetails from "./pages/TaskDetails";
 import Tasks from "./pages/Tasks";
 import Trash from "./pages/Trash";
 import Users from "./pages/Users";
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/Dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import MobileSidebar from "./components/MobileSidebar";
 
@@ -52,6 +52,7 @@ function Layout() {
   return (
     <div className='w-full h-screen flex flex-col md:flex-row'>
       <MobileSidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarToggle} />
       <div className='flex-1 overflow-y-auto'>
         <Navbar onToggleSidebar={handleSidebarToggle} />
         <div className='p-4 2xl:px-10'>
