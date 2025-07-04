@@ -18,165 +18,10 @@ const API = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    },
-    withCredentials: false
+    }
 });
 
-// Add CORS headers to all requests
-API.interceptors.request.use((config) => {
-    config.headers['Access-Control-Allow-Origin'] = '*';
-    config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
-    config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
-    return config;
-});
-
-// Server health check function
-const checkServerHealth = async () => {
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-        const response = await API.get('/api/health', {
-            signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-            throw new Error(`Health check failed: ${response.status}`);
-        }
-
-        const data = await response.data;
-        return data.status === 'ok';
-    } catch (error) {
-        console.error('Health check error:', error);
-        return false;
-    }
-};
-
-// Task-related functions
-const getTasks = async () => {
-    try {
-        console.log('Fetching tasks...');
-        const response = await API.get('/tasks');
-        console.log('Tasks fetched successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Get tasks', error);
-    }
-};
-
-const createTask = async (taskData) => {
-    try {
-        console.log('Creating task:', taskData);
-        const response = await API.post('/tasks/create', taskData);
-        console.log('Task created successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Create task', error);
-    }
-};
-
-const updateTask = async (taskId, taskData) => {
-    try {
-        console.log('Updating task:', taskId, taskData);
-        const response = await API.put(`/tasks/${taskId}`, taskData);
-        console.log('Task updated successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Update task', error);
-    }
-};
-
-const deleteTask = async (taskId) => {
-    try {
-        console.log('Deleting task:', taskId);
-        const response = await API.delete(`/tasks/${taskId}`);
-        console.log('Task deleted successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Delete task', error);
-    }
-};
-
-const getTaskById = async (taskId) => {
-    try {
-        console.log('Fetching task:', taskId);
-        const response = await API.get(`/tasks/${taskId}`);
-        console.log('Task fetched successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Get task', error);
-    }
-};
-
-// User-related functions
-const register = async (userData) => {
-    try {
-        console.log('Registering user...', userData);
-        const response = await API.post('/auth/register', userData);
-
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-        }
-
-        return response.data;
-    } catch (error) {
-        handleApiError('Registration', error);
-    }
-};
-
-const login = async (credentials) => {
-    try {
-        console.log('Attempting login...');
-        const response = await API.post('/auth/login', credentials);
-
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
-            console.log('Login successful');
-        }
-
-        return response.data;
-    } catch (error) {
-        handleApiError('Login', error);
-    }
-};
-
-const logout = async () => {
-    try {
-        console.log('Logging out...');
-        await API.post('/auth/logout');
-        localStorage.removeItem('token');
-        console.log('Logout successful');
-    } catch (error) {
-        localStorage.removeItem('token');
-        handleApiError('Logout', error);
-    }
-};
-
-const addUser = async (userData) => {
-    try {
-        console.log('Adding user...', userData);
-        const response = await API.post('/users', userData);
-        console.log('User added successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Add user', error);
-    }
-};
-
-const updateUser = async (userId, userData) => {
-    try {
-        console.log('Updating user:', userId, userData);
-        const response = await API.put(`/users/${userId}`, userData);
-        console.log('User updated successfully:', response.data);
-        return response.data;
-    } catch (error) {
-        handleApiError('Update user', error);
-    }
-};
-
-// Request interceptor
+// Request interceptor with token handling and logging
 API.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
@@ -200,7 +45,7 @@ API.interceptors.request.use(
     }
 );
 
-// Response interceptor
+// Response interceptor with retry logic
 API.interceptors.response.use(
     (response) => {
         const sanitizedResponse = {
@@ -240,8 +85,7 @@ API.interceptors.response.use(
 
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
-            window.location.href = '/login';
-            return Promise.reject(new Error('Session expired. Please login again.'));
+            return Promise.reject(error);
         }
 
         return Promise.reject(error);
@@ -266,17 +110,134 @@ const handleApiError = (context, error) => {
     throw new Error(errorMessage || `${context} operation failed`);
 };
 
-// Export all methods
-export {
-    register,
-    login,
-    logout,
-    getTasks,
-    createTask,
-    updateTask,
-    deleteTask,
-    getTaskById,
-    checkServerHealth,
-    addUser,
-    updateUser
+// Server health check function
+export const checkServerHealth = async () => {
+    try {
+        const response = await API.get('/api/health');
+        return response.data.status === 'ok';
+    } catch (error) {
+        console.error('Health check error:', error);
+        return false;
+    }
+};
+
+// User registration function
+export const register = async (userData) => {
+    try {
+        console.log('Registering user:', userData);
+        const response = await API.post('/auth/register', userData);
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
+        return response.data;
+    } catch (error) {
+        console.error('Registration error:', error);
+        throw error.response?.data || error.message || 'Registration failed. Please try again.';
+    }
+};
+
+// Task-related functions
+export const getTasks = async () => {
+    try {
+        console.log('Fetching tasks...');
+        const response = await API.get('/tasks');
+        return response.data;
+    } catch (error) {
+        console.error('Get tasks error:', error);
+        throw error.response?.data || error.message || 'Failed to fetch tasks. Please try again.';
+    }
+};
+
+export const createTask = async (taskData) => {
+    try {
+        console.log('Creating task:', taskData);
+        const response = await API.post('/tasks', taskData);
+        return response.data;
+    } catch (error) {
+        console.error('Create task error:', error);
+        throw error.response?.data || error.message || 'Failed to create task. Please try again.';
+    }
+};
+
+export const updateTask = async (taskId, taskData) => {
+    try {
+        console.log('Updating task:', taskId);
+        const response = await API.put(`/tasks/${taskId}`, taskData);
+        return response.data;
+    } catch (error) {
+        console.error('Update task error:', error);
+        throw error.response?.data || error.message || 'Failed to update task. Please try again.';
+    }
+};
+
+export const deleteTask = async (taskId) => {
+    try {
+        console.log('Deleting task:', taskId);
+        const response = await API.delete(`/tasks/${taskId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Delete task error:', error);
+        throw error.response?.data || error.message || 'Failed to delete task. Please try again.';
+    }
+};
+
+export const getTaskById = async (taskId) => {
+    try {
+        console.log('Fetching task:', taskId);
+        const response = await API.get(`/tasks/${taskId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Get task error:', error);
+        throw error.response?.data || error.message || 'Failed to fetch task. Please try again.';
+    }
+};
+
+// User-related functions
+export const login = async (credentials) => {
+    try {
+        console.log('Attempting login...');
+        const response = await API.post('/auth/login', credentials);
+        if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+        }
+        return response.data;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error.response?.data || error.message || 'Login failed. Please try again.';
+    }
+};
+
+export const logout = async () => {
+    try {
+        console.log('Logging out...');
+        localStorage.removeItem('token');
+        return { success: true };
+    } catch (error) {
+        console.error('Logout error:', error);
+        throw error.response?.data || error.message || 'Logout failed. Please try again.';
+    }
+};
+
+export const addUser = async (userData) => {
+    try {
+        console.log('Adding user...', userData);
+        const response = await API.post('/users', userData);
+        console.log('User added successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Add user error:', error);
+        throw error.response?.data || error.message || 'Failed to add user. Please try again.';
+    }
+};
+
+export const updateUser = async (userId, userData) => {
+    try {
+        console.log('Updating user:', userId, userData);
+        const response = await API.put(`/users/${userId}`, userData);
+        console.log('User updated successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Update user error:', error);
+        throw error.response?.data || error.message || 'Failed to update user. Please try again.';
+    }
 };
