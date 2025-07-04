@@ -13,8 +13,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
-    timeout: 10000, // Reduced timeout to 10 seconds
+    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com',
+    timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -125,14 +125,15 @@ export const checkServerHealth = async () => {
 export const register = async (userData) => {
     try {
         console.log('Registering user:', userData);
-        const response = await API.post('/auth/register', userData);
+        const response = await API.post('/api/auth/register', userData);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
         }
         return response.data;
     } catch (error) {
-        console.error('Registration error:', error.message);
-        throw error;
+        console.error('Registration error:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Please try again.';
+        throw new Error(errorMessage);
     }
 };
 
@@ -195,14 +196,15 @@ export const getTaskById = async (taskId) => {
 export const login = async (credentials) => {
     try {
         console.log('Attempting login...');
-        const response = await API.post('/auth/login', credentials);
+        const response = await API.post('/api/auth/login', credentials);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
         }
         return response.data;
     } catch (error) {
         console.error('Login error:', error);
-        throw error;
+        const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
+        throw new Error(errorMessage);
     }
 };
 
