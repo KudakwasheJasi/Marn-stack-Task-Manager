@@ -50,7 +50,7 @@ const linkData = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const Sidebar = () => {
   const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, 5);
 
   const closeSidebar = () => {
-    dispatch(setOpenSidebar(false));
+    onClose();
   };
 
   const NavLink = ({ el }) => {
@@ -80,7 +80,11 @@ const Sidebar = () => {
     );
   };
   return (
-    <div className='w-full  h-full flex flex-col gap-6 p-5'>
+    <div className={clsx(
+      'fixed inset-y-0 left-0 z-50 w-full h-full bg-white shadow-lg transition-transform duration-300',
+      isOpen ? 'translate-x-0' : '-translate-x-full',
+      'lg:translate-x-0 lg:static lg:w-64'
+    )}>
       <h1 className='flex gap-1 items-center'>
         <p className='bg-blue-600 p-2 rounded-full'>
           <MdOutlineAddTask className='text-white text-2xl font-black' />
