@@ -17,7 +17,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com',
     timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -200,18 +200,22 @@ export const getTaskById = async (taskId) => {
 export const login = async (credentials) => {
     try {
         console.log('Attempting login...', credentials);
-        const response = await API.post('/auth/login', credentials);
+        const response = await API.post('/api/auth/login', credentials);
         
         if (response.status === 200) {
-            const { token, user } = response.data;
-            if (token && user) {
+            // Ensure we get the correct response format
+            const { status, message, token, user } = response.data;
+            
+            if (status && status === true && token && user) {
                 localStorage.setItem('token', token);
                 return { token, user };
             } else {
-                throw new Error('Invalid login response format');
+                throw new Error(message || 'Invalid login response format');
             }
         } else {
-            throw new Error(response.data?.message || 'Login failed');
+            // Handle error cases
+            const { status, message } = response.data || {};
+            throw new Error(message || 'Login failed. Please check your credentials and try again.');
         }
     } catch (error) {
         console.error('Login error:', error);
