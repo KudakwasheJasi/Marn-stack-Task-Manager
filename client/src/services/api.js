@@ -155,7 +155,7 @@ export const getTasks = async () => {
 export const createTask = async (taskData) => {
     try {
         console.log('Creating task:', taskData);
-        const response = await API.post('/tasks', taskData);
+        const response = await API.post('/tasks/create', taskData);
         return response.data;
     } catch (error) {
         console.error('Create task error:', error);
