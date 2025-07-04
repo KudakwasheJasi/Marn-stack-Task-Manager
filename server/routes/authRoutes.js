@@ -113,6 +113,7 @@ router.post("/login", async (req, res) => {
 
         // Validate email format
         if (!email || !validateEmail(email)) {
+            console.log('Invalid email format:', email);
             return res.status(400).json({
                 status: false,
                 message: "Please provide a valid email address",
@@ -122,6 +123,7 @@ router.post("/login", async (req, res) => {
 
         // Validate password
         if (!password || password.length < 6) {
+            console.log('Invalid password:', password.length);
             return res.status(400).json({
                 status: false,
                 message: "Password must be at least 6 characters long",
@@ -135,9 +137,9 @@ router.post("/login", async (req, res) => {
 
         // Find user
         const user = await User.findOne({ email: sanitizedEmail }).select('+password');
-        console.log('User found:', user ? 'Yes' : 'No'); // Debug log
-
+        
         if (!user) {
+            console.log('User not found for email:', sanitizedEmail);
             return res.status(401).json({
                 status: false,
                 message: "Invalid email or password",
@@ -147,9 +149,10 @@ router.post("/login", async (req, res) => {
 
         // Compare password
         const passwordMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', passwordMatch); // Debug log
+        console.log('Password match:', passwordMatch);
 
         if (!passwordMatch) {
+            console.log('Password mismatch for user:', user._id);
             return res.status(401).json({
                 status: false,
                 message: "Invalid email or password",

@@ -200,7 +200,12 @@ export const getTaskById = async (taskId) => {
 export const login = async (credentials) => {
     try {
         console.log('Attempting login...', credentials);
-        const response = await API.post('/auth/login', credentials);
+        const response = await API.post('/auth/login', credentials, {
+            timeout: 10000, // 10 second timeout
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
         if (response.status === 200) {
             // Ensure we get the correct response format
