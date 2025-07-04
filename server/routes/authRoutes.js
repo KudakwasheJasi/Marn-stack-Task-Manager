@@ -150,9 +150,11 @@ router.post("/login", async (req, res) => {
         // Compare password
         const passwordMatch = await user.comparePassword(password);
         console.log('Password match:', passwordMatch);
+        console.log('Stored password hash:', user.password);
 
         if (!passwordMatch) {
             console.log('Password mismatch for user:', user._id);
+            console.log('Candidate password:', password);
             return res.status(401).json({
                 status: false,
                 message: "Invalid email or password",
