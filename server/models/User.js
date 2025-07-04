@@ -76,34 +76,11 @@ const tryComparePassword = async (candidatePassword, hash) => {
         const newHash = await bcrypt.hash(candidatePassword, saltRounds);
         const matchNew = await bcrypt.compare(candidatePassword, newHash);
         return matchNew;
-
-        return false;
     } catch (error) {
         console.error('Password comparison error:', error);
         return false;
     }
 };
-
-// Hash the password before saving the user
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-    
-    // Use consistent salt rounds
-    const saltRounds = 12;
-    const hash = await bcrypt.hash(this.password, saltRounds);
-    
-    // Store with $2a$ prefix for compatibility
-    this.password = hash.replace('$2b$', '$2a$');
-    
-    // Verify the hash
-    const isValid = await bcrypt.compare(this.password, hash);
-    if (!isValid) {
-        console.error('Password hash verification failed');
-        throw new Error('Failed to verify password hash');
-    }
-    
-    next();
-});
 
 // Method to check if the user is an admin
 userSchema.methods.isAdminUser = function() {

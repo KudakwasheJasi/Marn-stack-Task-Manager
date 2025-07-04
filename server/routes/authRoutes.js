@@ -197,9 +197,20 @@ router.post("/register", async (req, res) => {
 
     } catch (error) {
         console.error("Registration error:", error);
-        res.status(500).json({
+        let statusCode = 500;
+        let message = "Server error during registration";
+        
+        if (error.name === 'ValidationError') {
+            statusCode = 400;
+            message = "Invalid input data";
+        } else if (error.code === 11000) {
+            statusCode = 400;
+            message = "Email already registered";
+        }
+        
+        res.status(statusCode).json({
             status: false,
-            message: "Server error during registration"
+            message
         });
     }
 });
