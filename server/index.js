@@ -1,15 +1,3 @@
-/**
-    * @description      : 
-    * @author           : kudakwashe Ellijah
-    * @group            : 
-    * @created          : 02/07/2025 - 07:31:07
-    * 
-    * MODIFICATION LOG
-    * - Version         : 1.0.0
-    * - Date            : 02/07/2025
-    * - Author          : kudakwashe Ellijah
-    * - Modification    : Update import paths to use correct relative paths
-**/
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -21,289 +9,155 @@ import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
 
-// Load environment variables
+// Load env variables
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8800;
 
-// Ensure environment variables are set
+// Check for essential env vars
 if (!process.env.JWT_SECRET) {
-    console.error('JWT_SECRET environment variable is not set!');
-    process.exit(1);
+  console.error('❌ JWT_SECRET not set!');
+  process.exit(1);
 }
 
-// Mount API routes with prefix
-app.use('/api', (req, res, next) => {
-    next();
-});
+// === CORS CONFIGURATION ===
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://marn-stack-task-manager.vercel.app'
+];
 
-// Middleware configuration
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('❌ Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// === MIDDLEWARE ===
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Custom CORS middleware
-const corsMiddleware = (req, res, next) => {
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('Access-Control-Max-Age', '86400');
-        return res.status(204).send('');
-    }
-
-    // Always allow health check requests
-    if (req.path === '/health') {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET');
-        res.header('Access-Control-Allow-Headers', 'Content-Type');
-        return next();
-    }
-
-    // Handle other CORS requests
-    const origin = req.headers.origin;
-    if (!origin) {
-        console.log('CORS request from undefined origin - allowing');
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        return next();
-    }
-
-    try {
-        const originHost = new URL(origin).hostname;
-        const allowedOrigins = [
-            'localhost:3000',
-            'marn-stack-task-manager.onrender.com',
-            'marn-stack-task-manager.vercel.app'
-        ];
-
-        if (allowedOrigins.includes(originHost)) {
-            console.log('CORS request from allowed origin:', origin);
-            res.header('Access-Control-Allow-Origin', origin);
-            res.header('Access-Control-Allow-Credentials', 'true');
-            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
-            res.header('Access-Control-Expose-Headers', 'Content-Length, X-Total-Count, Authorization');
-            res.header('Vary', 'Origin');
-            return next();
-        } else {
-            console.log('CORS request from blocked origin:', origin);
-            res.header('Access-Control-Allow-Origin', origin);
-            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin, Accept, X-Requested-With');
-            res.status(403).json({ error: 'Not allowed by CORS' });
-        }
-    } catch (error) {
-        console.error('CORS middleware error:', error);
-        res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.status(400).json({ error: 'Invalid origin' });
-    }
-};
-
-// Apply middleware
-app.use(corsMiddleware);
-
-// Health check endpoints
-app.get('/health', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.status(200).json({ 
-        status: 'ok',
-        timestamp: new Date(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-
-app.get('/api/health', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.status(200).json({ 
-        status: 'ok',
-        timestamp: new Date(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-
+// === STATIC FILES ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Mount routes with API prefix
-app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
-
-// Request logging middleware
+// === LOGGING ===
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-    next();
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
 });
 
-// Root path handler
-app.get('/', (req, res) => {
-    res.json({
-        status: 'success',
-        message: 'API is running',
-        endpoints: {
-            auth: '/api/auth',
-            tasks: '/api/tasks',
-            users: '/api/users',
-            health: '/api/health'
-        },
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-
-app.get('/api', (req, res) => {
-    res.json({
-        status: 'success',
-        message: 'API is running',
-        endpoints: {
-            auth: '/api/auth',
-            tasks: '/api/tasks',
-            users: '/api/users',
-            health: '/api/health'
-        },
-        version: process.env.npm_package_version || '1.0.0'
-    });
-});
-
-// Health check endpoint
+// === HEALTH CHECK ===
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'ok',
-        timestamp: new Date(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        version: process.env.npm_package_version || '1.0.0'
-    });
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
+    version: process.env.npm_package_version || '1.0.0'
+  });
 });
 
-// Routes
+// === ROUTES ===
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
 app.use('/api/users', userRoutes);
 
-// 404 handler for non-existent routes
-app.use((req, res) => {
-    res.status(404).json({
-        status: 'error',
-        message: 'Endpoint not found',
-        timestamp: new Date(),
-        path: req.path
-    });
+// === ROOT INFO ROUTE ===
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'API is running',
+    endpoints: {
+      auth: '/api/auth',
+      tasks: '/api/tasks',
+      users: '/api/users',
+      health: '/api/health'
+    },
+    version: process.env.npm_package_version || '1.0.0'
+  });
 });
 
-// Error handling middleware
+// === 404 HANDLER ===
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Endpoint not found',
+    timestamp: new Date(),
+    path: req.originalUrl
+  });
+});
+
+// === ERROR HANDLER ===
 app.use((err, req, res, next) => {
-    console.error('Error:', {
-        message: err.message,
-        stack: err.stack,
-        timestamp: new Date(),
-        path: req.path,
-        method: req.method
-    });
+  console.error('Error:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path
+  });
 
-    const statusCode = err.statusCode || 500;
-    res.status(statusCode).json({
-        status: false,
-        message: err.message || 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? {
-            stack: err.stack,
-            details: err.details || null
-        } : 'Internal Server Error'
-    });
+  res.status(err.statusCode || 500).json({
+    status: false,
+    message: err.message || 'Something went wrong',
+    error: process.env.NODE_ENV === 'development' ? err.stack : 'Internal Server Error'
+  });
 });
 
-// 404 handler
-app.use((req, res) => {
-    res.status(404).json({
-        status: 'error',
-        message: 'Endpoint not found',
-        timestamp: new Date(),
-        path: req.path
-    });
-});
-
-// Global error handlers
-process.on('unhandledRejection', (error, promise) => {
-    console.error('Unhandled Rejection:', {
-        error: error,
-        promise: promise,
-        timestamp: new Date()
-    });
-    process.exit(1);
+// === UNHANDLED ERRORS ===
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+  process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', {
-        error: error,
-        timestamp: new Date()
-    });
-    process.exit(1);
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
 });
 
-// Database connection and server startup
-const startServer = async () => {
-    try {
-        // Connect to database
-        await dbConnection();
-        
-        // Start server
-        const server = app.listen(port, () => {
-            console.log(`
-==========================================
-🚀 Server is running on port ${port}
-📱 API: http://localhost:${port}/api
-🔐 Auth Routes: http://localhost:${port}/api/auth
-📋 Task Routes: http://localhost:${port}/api/tasks
-🏥 Health Check: http://localhost:${port}/api/health
-==========================================
-            `);
-        });
-
-        // Handle server errors
-        server.on('error', (error) => {
-            console.error('Server error:', error);
-            process.exit(1);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', {
-            error: error,
-            timestamp: new Date()
-        });
-        process.exit(1);
-    }
-};
-
-// Graceful shutdown handler
+// === GRACEFUL SHUTDOWN ===
 const shutdown = async (signal) => {
-    console.log(`\n${signal} received. Starting graceful shutdown...`);
-    
-    try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('Shutting down server...');
-        process.exit(0);
-    } catch (error) {
-        console.error('Error during shutdown:', error);
-        process.exit(1);
-    }
+  console.log(`\n${signal} received. Shutting down gracefully...`);
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Server shut down.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Shutdown error:', err);
+    process.exit(1);
+  }
 };
 
-// Handle termination signals
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// Start the server
+// === START SERVER ===
+const startServer = async () => {
+  try {
+    await dbConnection();
+    const server = app.listen(port, () => {
+      console.log(`
+🚀 Server running on port ${port}
+🌐 API Base: http://localhost:${port}/api
+✅ Health Check: http://localhost:${port}/api/health
+      `);
+    });
+
+    server.on('error', (error) => {
+      console.error('Server error:', error);
+      process.exit(1);
+    });
+  } catch (err) {
+    console.error('Startup error:', err);
+    process.exit(1);
+  }
+};
+
 startServer();
