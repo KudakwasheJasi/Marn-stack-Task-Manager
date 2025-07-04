@@ -135,8 +135,8 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        // Find user
-        const user = await User.findOne({ email: sanitizedEmail });
+        // Find user with password
+        const user = await User.findOne({ email: sanitizedEmail }).select('+password');
         
         if (!user) {
             console.log('User not found for email:', sanitizedEmail);
@@ -147,20 +147,8 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        // Get password separately
-        const userWithPassword = await User.findById(user._id).select('+password');
-        
-        if (!userWithPassword) {
-            console.log('Failed to get user password');
-            return res.status(500).json({
-                status: false,
-                message: "Server error",
-                data: null
-            });
-        }
-
         // Compare password
-        const passwordMatch = await bcrypt.compare(password, userWithPassword.password);
+        const passwordMatch = await user.comparePassword(password);
         console.log('Password match:', passwordMatch);
 
         if (!passwordMatch) {
