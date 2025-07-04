@@ -42,6 +42,70 @@ router.get("/", protectRoute, async (req, res) => {
 });
 
 // POST route for creating tasks
+router.put("/:id", protectRoute, async (req, res) => {
+    try {
+        console.log('Updating task with data:', req.body);
+        console.log('User ID:', req.user.userId);
+
+        const { title, description, priority, stage } = req.body;
+        const taskId = req.params.id;
+
+        if (!title) {
+            return res.status(400).json({
+                status: false,
+                message: "Title is required"
+            });
+        }
+
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).json({
+                status: false,
+                message: "Task not found"
+            });
+        }
+
+        // Update task fields
+        task.title = title;
+        task.description = description || task.description;
+        task.priority = priority || task.priority;
+        task.stage = stage || task.stage;
+
+        // Add activity log
+        task.activities.push({
+            type: "updated",
+            activity: "Task updated",
+            by: req.user.userId,
+            date: new Date()
+        });
+
+        await task.save();
+
+        const populatedTask = await Task.findById(task._id)
+            .populate("team", "name email")
+            .populate("activities.by", "name email");
+
+        res.status(200).json({
+            status: true,
+            message: "Task updated successfully",
+            task: populatedTask
+        });
+    } catch (error) {
+        console.error("Update task error:", error);
+        res.status(500).json({
+            status: false,
+            message: error.message,
+            stack: process.env.NODE_ENV === 'production' ? null : error.stack,
+            details: process.env.NODE_ENV === 'production' ? null : {
+                name: error.name,
+                code: error.code,
+                message: error.message
+            }
+        });
+    }
+});
+
+// POST route for creating tasks
 router.post("/create", protectRoute, async (req, res) => {
     try {
         console.log('Creating task with data:', req.body);

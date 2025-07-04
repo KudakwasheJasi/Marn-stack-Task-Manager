@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { deleteTask } from '../../services/api';
+import TaskDialog from './TaskDialog';
 import { BiMessageAltDetail } from "react-icons/bi";
 import {
   MdAttachFile,
@@ -31,7 +32,6 @@ const Table = ({ tasks, refetchTasks }) => {
     setOpenDialog(true);
   }, []);
 
-  // Modified deleteHandler function
   const deleteHandler = async () => {
     if (!selected) return;
 
@@ -139,11 +139,9 @@ const Table = ({ tasks, refetchTasks }) => {
 
       <td className='py-3 px-4'>
         <div className='flex gap-2 md:gap-4 justify-end'>
-          <Button
-            className='text-blue-600 hover:text-blue-500 hover:bg-blue-50 px-3 py-1 rounded text-sm md:text-base transition-colors'
-            label='Edit'
-            type='button'
-            disabled={loading}
+          <TaskDialog
+            task={task}
+            refetchTasks={refetchTasks}
           />
 
           <Button

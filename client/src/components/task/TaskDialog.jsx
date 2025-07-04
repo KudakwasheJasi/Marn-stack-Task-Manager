@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiTwotoneFolderOpen } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
@@ -10,13 +10,14 @@ import AddTask from "./AddTask";
 import AddSubTask from "./AddSubTask";
 import ConfirmationDialog from "../Dialogs";
 import { toast } from 'sonner';
-import { deleteTask, createTask } from '../../services/api'; // Ensure deleteTask and createTask are imported
+import { deleteTask, createTask, updateTask } from '../../services/api'; // Ensure deleteTask and createTask are imported
 
 const TaskDialog = ({ task, refetchTasks }) => {
   const [open, setOpen] = useState(false); // State for adding sub-task
   const [openEdit, setOpenEdit] = useState(false); // State for editing task
   const [openDialog, setOpenDialog] = useState(false); // State for confirmation dialog
   const [loading, setLoading] = useState(false); // State for loading indicator
+  const audioRef = useRef(null); // Reference for audio element
 
   const navigate = useNavigate(); // Hook for navigation
 
@@ -33,6 +34,13 @@ const TaskDialog = ({ task, refetchTasks }) => {
 
       await createTask(duplicateData);
       toast.success('Task duplicated successfully');
+      
+      // Play sound notification
+      const audio = audioRef.current;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(error => console.error('Error playing sound:', error));
+      }
       
       if (typeof refetchTasks === 'function') {
         await refetchTasks();
@@ -55,6 +63,14 @@ const TaskDialog = ({ task, refetchTasks }) => {
     try {
       setLoading(true);
       await deleteTask(task._id); // Call the deleteTask function
+      
+      // Play sound notification
+      const audio = audioRef.current;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(error => console.error('Error playing sound:', error));
+      }
+      
       toast.success('Task deleted successfully');
       
       if (typeof refetchTasks === 'function') {
@@ -97,6 +113,7 @@ const TaskDialog = ({ task, refetchTasks }) => {
 
   return (
     <>
+      <audio ref={audioRef} src="/alarm-sound.mp3" preload="auto" />
       <div className="relative">
         <Menu as='div' className='relative inline-block text-left'>
           <Menu.Button 

@@ -161,10 +161,20 @@ const UserTable = ({ users }) => {
 };
 const Dashboard = () => {
   const [tasks, setTasks] = useState(summary.last10Task);
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   const refreshTasks = () => {
     setTasks(summary.last10Task);
     toast.success('Tasks refreshed');
+  };
+
+  const handleStatusClick = (status) => {
+    setSelectedStatus(status);
+    if (status === 'all') {
+      setTasks(summary.last10Task);
+    } else {
+      setTasks(summary.last10Task.filter(task => task.stage === status));
+    }
   };
 
   const stats = [
@@ -220,8 +230,10 @@ const Dashboard = () => {
 
         <div className='flex items-center gap-2'>
           <button
-            onClick={handleRefresh}
-            className='w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors'
+            onClick={() => handleStatusClick(status)}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+              selectedStatus === status ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
           >
             <MdKeyboardArrowUp className='text-gray-600' />
           </button>
