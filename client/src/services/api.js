@@ -204,18 +204,20 @@ export const login = async (credentials) => {
         
         if (response.status === 200) {
             // Ensure we get the correct response format
-            const { status, message, token, user } = response.data;
+            const { status, message, token, user, data } = response.data;
             
             if (status && status === true && token && user) {
                 localStorage.setItem('token', token);
                 return { token, user };
+            } else if (data) {
+                throw new Error(data.message || 'Invalid login response format');
             } else {
                 throw new Error(message || 'Invalid login response format');
             }
         } else {
             // Handle error cases
-            const { status, message } = response.data || {};
-            throw new Error(message || 'Login failed. Please check your credentials and try again.');
+            const { status, message, data } = response.data || {};
+            throw new Error(data?.message || message || 'Login failed. Please check your credentials and try again.');
         }
     } catch (error) {
         console.error('Login error:', error);

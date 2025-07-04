@@ -105,7 +105,7 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Login route - simplified and improved error handling
+// Login route - improved error handling and response format
 router.post("/login", async (req, res) => {
     try {
         console.log('Login attempt:', req.body); // Debug log
@@ -114,7 +114,8 @@ router.post("/login", async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({
                 status: false,
-                message: "Email and password are required"
+                message: "Email and password are required",
+                data: null
             });
         }
 
@@ -127,7 +128,8 @@ router.post("/login", async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 status: false,
-                message: "Invalid email or password"
+                message: "Invalid email or password",
+                data: null
             });
         }
 
@@ -137,7 +139,8 @@ router.post("/login", async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({
                 status: false,
-                message: "Invalid email or password"
+                message: "Invalid email or password",
+                data: null
             });
         }
 
