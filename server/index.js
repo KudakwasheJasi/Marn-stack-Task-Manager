@@ -44,7 +44,7 @@ const corsOptions = {
   exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
-  preflightContinue: true,
+  preflightContinue: false, // Changed to false
   allowCredentials: true
 };
 
