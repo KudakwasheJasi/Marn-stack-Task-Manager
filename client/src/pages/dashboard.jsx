@@ -10,14 +10,14 @@
     * - Author          : kudakwashe Ellijah
     * - Modification    : 
 **/
-import React from "react";
+import React, { useState } from "react";
 import {
   MdAdminPanelSettings,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
+  MdEdit, // <-- Use this as the edit/clipboard icon
 } from "react-icons/md";
-import { LuClipboardEdit } from "react-icons/lu";
 import { FaNewspaper, FaUsers } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
 import moment from "moment";
@@ -167,8 +167,6 @@ const Dashboard = () => {
     toast.success('Tasks refreshed');
   };
 
-  const totals = summary.tasks;
-
   const stats = [
     {
       _id: "1",
@@ -176,27 +174,31 @@ const Dashboard = () => {
       total: summary?.totalTasks || 0,
       icon: <FaNewspaper />,
       bg: "bg-[#1d4ed8]",
+      status: "all"
     },
     {
       _id: "2",
       label: "COMPLTED TASK",
-      total: totals["completed"] || 0,
+      total: summary?.tasks?.completed || 0,
       icon: <MdAdminPanelSettings />,
       bg: "bg-[#0f766e]",
+      status: "completed"
     },
     {
       _id: "3",
       label: "TASK IN PROGRESS ",
-      total: totals["in progress"] || 0,
-      icon: <LuClipboardEdit />,
+      total: summary?.tasks?.['in progress'] || 0,
+      icon: <MdEdit />, // <-- fixed icon here
       bg: "bg-[#f59e0b]",
+      status: "in progress"
     },
     {
       _id: "4",
       label: "TODOS",
-      total: totals["todo"] || 0,
+      total: summary?.tasks?.todo || 0,
       icon: <FaArrowsToDot />,
       bg: "bg-[#be185d]",
+      status: "todo"
     },
   ];
 
