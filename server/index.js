@@ -88,6 +88,10 @@ app.use('/api', (req, res, next) => {
     next();
 });
 
+// Explicit route handlers for auth endpoints
+app.post('/api/auth/login', authRoutes); // Handle login directly
+app.post('/api/auth/register', authRoutes); // Handle registration directly
+
 // Use the router middleware
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
