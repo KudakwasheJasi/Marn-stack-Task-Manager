@@ -4,8 +4,27 @@
  * @returns {boolean} - True if email is valid
  */
 export const validateEmail = (email) => {
+    if (!email) return false;
+    
+    // Remove whitespace and convert to lowercase
+    email = email.trim().toLowerCase();
+    
+    // Basic email format check
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
+    if (!re.test(email)) {
+        console.log('Email failed basic validation:', email);
+        return false;
+    }
+
+    // Check for common email providers
+    const commonProviders = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com'];
+    const domain = email.split('@')[1];
+    if (commonProviders.includes(domain)) {
+        return true;
+    }
+
+    // For other domains, do basic validation
+    return re.test(email);
 };
 
 /**

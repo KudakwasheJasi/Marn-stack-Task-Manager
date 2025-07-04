@@ -112,14 +112,18 @@ router.post("/login", async (req, res) => {
         const { email, password } = req.body;
 
         // Validate email format
-        if (!email || !validateEmail(email)) {
-            console.log('Invalid email format:', email);
+        if (!email) {
+            console.log('Email is empty');
             return res.status(400).json({
                 status: false,
-                message: "Please provide a valid email address",
+                message: "Email is required",
                 data: null
             });
         }
+
+        // Sanitize and normalize email
+        const sanitizedEmail = sanitizeInput(email.toLowerCase(), true);
+        console.log('Sanitized email:', sanitizedEmail); // Debug log
 
         // Validate password
         if (!password || password.length < 6) {
@@ -130,10 +134,6 @@ router.post("/login", async (req, res) => {
                 data: null
             });
         }
-
-        // Sanitize email
-        const sanitizedEmail = sanitizeInput(email.toLowerCase(), true);
-        console.log('Sanitized email:', sanitizedEmail); // Debug log
 
         // Find user
         const user = await User.findOne({ email: sanitizedEmail }).select('+password');
