@@ -57,7 +57,15 @@ const Register = () => {
       const response = await registerUser(userData);
       
       if (response?.status) {
-        toast.success('Registration successful! Please login to continue.');
+        // Success animation and message
+        toast.success(
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-full animate-bounce"></div>
+            </div>
+            <span>Registration successful! Please login to continue.</span>
+          </div>
+        );
         reset();
         navigate('/log-in');
       } else {
