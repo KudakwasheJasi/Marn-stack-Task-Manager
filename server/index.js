@@ -9,7 +9,8 @@ import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
 
-dotenv.config();
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+dotenv.config({ path: envFile });
 
 const app = express();
 const port = process.env.PORT || 8800;
