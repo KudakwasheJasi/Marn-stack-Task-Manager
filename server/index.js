@@ -24,7 +24,7 @@ if (!process.env.JWT_SECRET) {
 const allowedOrigins = [
   'http://localhost:3000',
   'https://marn-stack-task-manager.vercel.app',
-  'https://taskmanager-api.onrender.com'
+  'https://marn-stack-task-manager.onrender.com'
 ];
 
 const corsOptions = {
@@ -67,7 +67,7 @@ app.use((req, res, next) => {
 });
 
 // === HEALTH CHECK ===
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
