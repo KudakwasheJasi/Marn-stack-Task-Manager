@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/Sidebar.tsx";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import TaskDetails from "./pages/TaskDetails";
