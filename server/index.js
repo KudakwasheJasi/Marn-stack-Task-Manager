@@ -23,7 +23,8 @@ if (!process.env.JWT_SECRET) {
 // === CORS CONFIGURATION ===
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://marn-stack-task-manager.vercel.app'
+  'https://marn-stack-task-manager.vercel.app',
+  'https://taskmanager-api.onrender.com'
 ];
 
 const corsOptions = {
@@ -43,7 +44,8 @@ const corsOptions = {
   exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
-  preflightContinue: true
+  preflightContinue: true,
+  allowCredentials: true
 };
 
 app.use(cors(corsOptions));
@@ -65,7 +67,7 @@ app.use((req, res, next) => {
 });
 
 // === HEALTH CHECK ===
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');

@@ -13,7 +13,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.vercel.app/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://taskmanager-api.onrender.com/api',
     timeout: 30000, // Reduced timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ const handleApiError = (context, error) => {
 // Server health check function
 export const checkServerHealth = async () => {
     try {
-        const response = await API.get('/api/health');
+        const response = await API.get('/health');
         return response.data.status === 'ok';
     } catch (error) {
         console.error('Health check error:', error);
