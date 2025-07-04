@@ -49,20 +49,46 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Helper function to try multiple bcrypt versions
+const tryComparePassword = async (candidatePassword, hash) => {
+    try {
+        // Try with the current bcrypt version
+        const match = await bcrypt.compare(candidatePassword, hash);
+        if (match) return true;
+
+        // If that fails, try with different prefix
+        if (hash.startsWith('$2a$')) {
+            // Try with $2b$ prefix
+            const modifiedHash = hash.replace('$2a$', '$2b$');
+            const match2b = await bcrypt.compare(candidatePassword, modifiedHash);
+            if (match2b) return true;
+        }
+
+        // If that fails, try with $2y$ prefix
+        if (hash.startsWith('$2y$')) {
+            const modifiedHash = hash.replace('$2y$', '$2a$');
+            const match2a = await bcrypt.compare(candidatePassword, modifiedHash);
+            if (match2a) return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.error('Password comparison error:', error);
+        return false;
+    }
+};
+
 // Hash the password before saving the user
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     
-    // Use consistent salt rounds and prefix
+    // Use consistent salt rounds
     const saltRounds = 12;
     const hash = await bcrypt.hash(this.password, saltRounds);
     
-    // Ensure the hash uses the correct prefix
-    if (!hash.startsWith('$2a$')) {
-        throw new Error('Password hash format is incorrect');
-    }
+    // Store with $2a$ prefix for compatibility
+    this.password = hash.replace('$2b$', '$2a$');
     
-    this.password = hash;
     next();
 });
 
@@ -74,12 +100,8 @@ userSchema.methods.isAdminUser = function() {
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
-        // Ensure the stored hash uses the correct prefix
-        if (!this.password.startsWith('$2a$')) {
-            throw new Error('Stored password hash format is incorrect');
-        }
-        
-        return await bcrypt.compare(candidatePassword, this.password);
+        // Try multiple bcrypt versions
+        return await tryComparePassword(candidatePassword, this.password);
     } catch (error) {
         console.error('Password comparison error:', error);
         return false;
