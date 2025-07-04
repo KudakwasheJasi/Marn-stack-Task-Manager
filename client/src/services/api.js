@@ -199,12 +199,20 @@ export const getTaskById = async (taskId) => {
 // User-related functions
 export const login = async (credentials) => {
     try {
-        console.log('Attempting login...');
+        console.log('Attempting login...', credentials);
         const response = await API.post('/auth/login', credentials);
-        if (response.data.token) {
-            localStorage.setItem('token', response.data.token);
+        
+        if (response.status === 200) {
+            const { token, user } = response.data;
+            if (token && user) {
+                localStorage.setItem('token', token);
+                return { token, user };
+            } else {
+                throw new Error('Invalid login response format');
+            }
+        } else {
+            throw new Error(response.data?.message || 'Login failed');
         }
-        return response.data;
     } catch (error) {
         console.error('Login error:', error);
         const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
