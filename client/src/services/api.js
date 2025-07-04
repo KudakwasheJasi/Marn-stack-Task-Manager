@@ -17,7 +17,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com',
+    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
     timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
