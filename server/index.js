@@ -44,7 +44,7 @@ const corsOptions = {
   exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
   maxAge: 86400,
   optionsSuccessStatus: 204,
-  preflightContinue: false, // Changed to false
+  preflightContinue: false,
   allowCredentials: true
 };
 
@@ -52,8 +52,8 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 // === MIDDLEWARE ===
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // === STATIC FILES ===
 const __filename = fileURLToPath(import.meta.url);
@@ -67,18 +67,30 @@ app.use((req, res, next) => {
 });
 
 // === HEALTH CHECK ===
-app.get('/api/health', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).json({
-    status: 'ok',
-    timestamp: new Date(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
-    version: process.env.npm_package_version || '1.0.0'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Check database connection
+    await dbConnection();
+    
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+      version: process.env.npm_package_version || '1.0.0'
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'error',
+      message: 'Service unavailable'
+    });
+  }
 });
 
 // === ROUTES ===
@@ -100,6 +112,15 @@ app.use('/api/users', userRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Server Error:', err);
+    
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({
+            status: false,
+            message: err.message,
+            errors: err.errors
+        });
+    }
+
     res.status(500).json({
         status: false,
         message: 'Internal server error'

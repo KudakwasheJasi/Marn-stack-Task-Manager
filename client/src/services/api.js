@@ -201,9 +201,13 @@ export const login = async (credentials) => {
     try {
         console.log('Attempting login...', credentials);
         const response = await API.post('/auth/login', credentials, {
-            timeout: 10000, // 10 second timeout
+            timeout: 30000, // Increased to 30 seconds
             headers: {
                 'Content-Type': 'application/json'
+            },
+            validateStatus: (status) => {
+                // Consider any status between 200-299 as success
+                return status >= 200 && status < 300;
             }
         });
         
@@ -233,8 +237,17 @@ export const login = async (credentials) => {
     } catch (error) {
         console.error('Login error:', error);
         let errorMessage = error.response?.data?.message;
+        
         if (!errorMessage) {
-            errorMessage = error.message || 'Login failed. Please try again.';
+            if (error.code === 'ECONNABORTED') {
+                errorMessage = 'Connection timeout. Please check your internet connection and try again.';
+            } else if (error.code === 'ERR_BAD_REQUEST') {
+                errorMessage = 'Invalid request. Please check your credentials and try again.';
+            } else if (error.code === 'ERR_NETWORK') {
+                errorMessage = 'Network error. Please check your internet connection and try again.';
+            } else {
+                errorMessage = error.message || 'Login failed. Please try again.';
+            }
         }
         throw new Error(errorMessage);
     }
