@@ -24,6 +24,87 @@ router.get('/test', (_, res) => {
     res.json({ status: true, message: 'Auth routes are working!' });
 });
 
+// Register route
+router.post("/register", async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        // Validate inputs
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                status: false,
+                message: "Name, email, and password are required"
+            });
+        }
+
+        if (!validateEmail(email)) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid email format"
+            });
+        }
+
+        if (!validatePassword(password)) {
+            return res.status(400).json({
+                status: false,
+                message: "Password must be at least 6 characters long"
+            });
+        }
+
+        if (!validateName(name)) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid name format"
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
+            return res.status(400).json({
+                status: false,
+                message: "User already exists"
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const user = new User({
+            name: sanitizeInput(name),
+            email: email.toLowerCase(),
+            password: hashedPassword
+        });
+
+        await user.save();
+
+        // Create token
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+            status: true,
+            message: "User registered successfully",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({
+            status: false,
+            message: "Registration failed"
+        });
+    }
+});
+
 // Login route - simplified and improved error handling
 router.post("/login", async (req, res) => {
     try {
