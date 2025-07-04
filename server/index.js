@@ -27,18 +27,28 @@ const allowedOrigins = [
   'https://marn-stack-task-manager.vercel.app'
 ];
 
-app.use(cors({
+// Define CORS options
+const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      console.log(`✅ CORS Allowed: ${origin}`);
+      return callback(null, true);
     } else {
-      callback(new Error('❌ Not allowed by CORS'));
+      console.warn(`❌ CORS Blocked: ${origin}`);
+      return callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight OPTIONS requests
+app.options('*', cors(corsOptions));
 
 // === MIDDLEWARE ===
 app.use(express.json());
@@ -143,11 +153,9 @@ const startServer = async () => {
   try {
     await dbConnection();
     const server = app.listen(port, () => {
-      console.log(`
-🚀 Server running on port ${port}
-🌐 API Base: http://localhost:${port}/api
-✅ Health Check: http://localhost:${port}/api/health
-      `);
+      console.log(`🚀 Server running on port ${port}`);
+      console.log(`🌐 API Base: http://localhost:${port}/api`);
+      console.log(`✅ Health Check: http://localhost:${port}/api/health`);
     });
 
     server.on('error', (error) => {

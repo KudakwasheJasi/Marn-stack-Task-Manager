@@ -1,14 +1,14 @@
 /**
-    * @description      : 
-    * @author           : kudakwashe Ellijah
-    * @group            : 
-    * @created          : 03/07/2025 - 17:57:45
-    * 
-    * MODIFICATION LOG
-    * - Version         : 1.0.0
-    * - Date            : 03/07/2025
-    * - Author          : kudakwashe Ellijah
-    * - Modification    : Updated API configuration to handle routes correctly
+ * @description      : 
+ * @author           : kudakwashe Ellijah
+ * @group            : 
+ * @created          : 03/07/2025 - 17:57:45
+ * 
+ * MODIFICATION LOG
+ * - Version         : 1.0.1
+ * - Date            : 04/07/2025
+ * - Author          : kudakwashe Ellijah
+ * - Modification    : Fixed double /api prefix in health check URL
 **/
 import axios from 'axios';
 
@@ -28,7 +28,8 @@ const checkServerHealth = async () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const response = await API.get('/api/health', {
+        // ✅ FIX: Removed double /api
+        const response = await API.get('/health', {
             signal: controller.signal
         });
 
@@ -107,11 +108,11 @@ const register = async (userData) => {
     try {
         console.log('Registering user...', userData);
         const response = await API.post('/auth/register', userData);
-        
+
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
         }
-        
+
         return response.data;
     } catch (error) {
         handleApiError('Registration', error);
@@ -122,12 +123,12 @@ const login = async (credentials) => {
     try {
         console.log('Attempting login...');
         const response = await API.post('/auth/login', credentials);
-        
+
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
             console.log('Login successful');
         }
-        
+
         return response.data;
     } catch (error) {
         handleApiError('Login', error);
@@ -205,7 +206,7 @@ API.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config;
-        
+
         if (!originalRequest) {
             return Promise.reject(error);
         }
@@ -215,10 +216,10 @@ API.interceptors.response.use(
         if (error.code === 'ERR_NETWORK' && originalRequest._retry < 3) {
             originalRequest._retry += 1;
             console.log(`Retrying request (${originalRequest._retry}/3)...`);
-            
+
             const delay = Math.min(1000 * (2 ** originalRequest._retry), 10000);
             await new Promise(resolve => setTimeout(resolve, delay));
-            
+
             try {
                 const isHealthy = await checkServerHealth();
                 if (isHealthy) {
