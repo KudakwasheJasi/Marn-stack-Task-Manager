@@ -9,11 +9,15 @@
  * - Date            : 04/07/2025
  * - Author          : kudakwashe Ellijah
  * - Modification    : Fixed double /api prefix in health check URL
+ * - Version         : 1.0.2
+ * - Date            : 04/07/2025
+ * - Author          : kudakwashe Ellijah
+ * - Modification    : Updated API configuration to use the correct URL with /api prefix
 **/
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com',
+    baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
     timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
@@ -125,7 +129,7 @@ export const checkServerHealth = async () => {
 export const register = async (userData) => {
     try {
         console.log('Registering user:', userData);
-        const response = await API.post('/api/auth/register', userData);
+        const response = await API.post('/auth/register', userData);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
         }
@@ -196,7 +200,7 @@ export const getTaskById = async (taskId) => {
 export const login = async (credentials) => {
     try {
         console.log('Attempting login...');
-        const response = await API.post('/api/auth/login', credentials);
+        const response = await API.post('/auth/login', credentials);
         if (response.data.token) {
             localStorage.setItem('token', response.data.token);
         }
