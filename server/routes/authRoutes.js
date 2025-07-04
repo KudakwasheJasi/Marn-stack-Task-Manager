@@ -19,18 +19,13 @@ import { protectRoute as authenticateToken } from "../middlewares/authMiddlewave
 
 const router = express.Router();
 
-// Redirect /register to /auth/register
-router.all('/register', (req, res) => {
-    res.redirect(`/auth${req.url}`);
-});
-
 // Test route - useful for debugging
 router.get('/test', (_, res) => {
     res.json({ status: true, message: 'Auth routes are working!' });
 });
 
 // Register route
-router.post("/auth/register", async (req, res) => {
+router.post("/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
 

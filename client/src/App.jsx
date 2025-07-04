@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Login from "./pages/Login";
-import Register from "./pages/Register"; // Added Register import
+import Register from "./pages/Register";
 import TaskDetails from "./pages/TaskDetails";
 import Tasks from "./pages/Tasks";
 import Trash from "./pages/Trash";
@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (!user) {
-    return <Navigate to='/log-in' state={{ from: location }} replace />;
+    return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
   return children;
@@ -41,16 +41,31 @@ const PublicRoute = ({ children }) => {
 };
 
 function Layout() {
+  const dispatch = useDispatch();
+  const isSidebarOpen = useSelector((state) => state.auth.isSidebarOpen);
+
+  const handleSidebarToggle = () => {
+    dispatch(setOpenSidebar(!isSidebarOpen));
+  };
+
   return (
     <div className='w-full h-screen flex flex-col md:flex-row'>
-      <div className='w-1/5 h-screen bg-white sticky top-0 hidden md:block'>
-        <Sidebar />
-      </div>
-
-      <MobileSidebar />
+      <Transition
+        show={isSidebarOpen}
+        enter="transition-all duration-300"
+        enterFrom="translate-x-full"
+        enterTo="translate-x-0"
+        leave="transition-all duration-300"
+        leaveFrom="translate-x-0"
+        leaveTo="translate-x-full"
+      >
+        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg md:static md:inset-0 md:translate-x-0">
+          <Sidebar />
+        </div>
+      </Transition>
 
       <div className='flex-1 overflow-y-auto'>
-        <Navbar />
+        <Navbar onToggleSidebar={handleSidebarToggle} />
         <div className='p-4 2xl:px-10'>
           <Outlet />
         </div>
@@ -115,48 +130,41 @@ const MobileSidebar = () => {
 
 function App() {
   return (
-    <main className='w-full min-h-screen bg-[#f3f4f6]'>
+    <div className="min-h-screen bg-gray-100">
       <Routes>
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route index element={<Navigate to='/dashboard' />} />
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/tasks' element={<Tasks />} />
-          <Route path='/completed/:status' element={<Tasks />} />
-          <Route path='/in-progress/:status' element={<Tasks />} />
-          <Route path='/todo/:status' element={<Tasks />} />
-          <Route path='/team' element={<Users />} />
-          <Route path='/trashed' element={<Trash />} />
-          <Route path='/task/:id' element={<TaskDetails />} />
-        </Route>
-
         {/* Public Routes */}
-        <Route path='/log-in' element={
+        <Route path="/login" element={
           <PublicRoute>
             <Login />
           </PublicRoute>
         } />
-        <Route path='/register' element={
+        <Route path="/register" element={
           <PublicRoute>
             <Register />
           </PublicRoute>
         } />
 
-        {/* Catch all route */}
-        <Route path='*' element={<Navigate to='/dashboard' replace />} />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/:taskId" element={<TaskDetails />} />
+          <Route path="/trash" element={<Trash />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Route>
       </Routes>
-
       <Toaster
-        position="top-right"
-        expand={false}
         richColors
-        closeButton
+        position="top-right"
         theme="light"
         duration={4000}
         toastOptions={{
           style: {
             background: 'white',
             border: '1px solid #E2E8F0',
+            color: '#1F2937'
           },
           success: {
             style: {
@@ -172,7 +180,7 @@ function App() {
           },
         }}
       />
-    </main>
+    </div>
   );
 }
 
