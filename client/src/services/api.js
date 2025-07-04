@@ -21,8 +21,7 @@ const API = axios.create({
     timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': 'https://marn-stack-task-manager.vercel.app'
+        'Accept': 'application/json'
     }
 });
 
@@ -201,11 +200,7 @@ export const getTaskById = async (taskId) => {
 export const login = async (credentials) => {
     try {
         console.log('Attempting login...', credentials);
-        const response = await API.post('/api/auth/login', credentials, {
-            headers: {
-                'Origin': 'https://marn-stack-task-manager.vercel.app'
-            }
-        });
+        const response = await API.post('/auth/login', credentials);
         
         if (response.status === 200) {
             // Ensure we get the correct response format

@@ -82,6 +82,20 @@ app.get('/api/health', (req, res) => {
 });
 
 // === ROUTES ===
+// Add explicit route handlers for auth endpoints
+app.post('/api/auth/login', (req, res) => {
+    authRoutes(req, res);
+});
+app.post('/api/auth/register', (req, res) => {
+    authRoutes(req, res);
+});
+
+// Add middleware for all API routes
+app.use('/api', (req, res, next) => {
+    console.log(`API Request: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
 app.use('/api/users', userRoutes);
