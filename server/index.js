@@ -44,7 +44,8 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-Requested-With'],
   exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
   maxAge: 86400,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
+  preflightContinue: true
 };
 
 // Apply CORS middleware
@@ -70,6 +71,10 @@ app.use((req, res, next) => {
 
 // === HEALTH CHECK ===
 app.get('/api/health', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.status(200).json({
     status: 'ok',
     timestamp: new Date(),

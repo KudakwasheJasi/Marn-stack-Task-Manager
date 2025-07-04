@@ -18,7 +18,16 @@ const API = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    }
+    },
+    withCredentials: false
+});
+
+// Add CORS headers to all requests
+API.interceptors.request.use((config) => {
+    config.headers['Access-Control-Allow-Origin'] = '*';
+    config.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+    return config;
 });
 
 // Server health check function
@@ -27,8 +36,7 @@ const checkServerHealth = async () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        // ✅ FIX: Removed double /api
-        const response = await API.get('/health', {
+        const response = await API.get('/api/health', {
             signal: controller.signal
         });
 
