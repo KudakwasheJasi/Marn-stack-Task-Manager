@@ -9,14 +9,14 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://marn-stack-task-manager.onrender.com/$1"
+      "destination": "https://marn-stack-task-manager.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/$1"
     }
   ],
   "env": {
-    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com"
+    "VITE_API_URL": "https://marn-stack-task-manager.onrender.com/api"
   }
 }
