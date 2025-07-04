@@ -86,6 +86,9 @@ const Register = () => {
               <span className="hover:text-blue-800 transition-colors">Task Manager</span>
             </p>
           </div>
+          <div className='cell'>
+              <div className='circle rotate-in-up-left'></div>
+            </div>
         </div>
 
         {/* Right side - Form */}
