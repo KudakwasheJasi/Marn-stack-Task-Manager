@@ -14,7 +14,7 @@ import axios from 'axios';
 
 const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
-    timeout: 30000, // Reduced timeout to 30 seconds
+    timeout: 10000, // Reduced timeout to 10 seconds
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -131,20 +131,19 @@ export const register = async (userData) => {
         }
         return response.data;
     } catch (error) {
-        console.error('Registration error:', error);
-        throw error.response?.data || error.message || 'Registration failed. Please try again.';
+        console.error('Registration error:', error.message);
+        throw error;
     }
 };
 
 // Task-related functions
 export const getTasks = async () => {
     try {
-        console.log('Fetching tasks...');
         const response = await API.get('/tasks');
         return response.data;
     } catch (error) {
         console.error('Get tasks error:', error);
-        throw error.response?.data || error.message || 'Failed to fetch tasks. Please try again.';
+        throw error;
     }
 };
 
@@ -155,7 +154,7 @@ export const createTask = async (taskData) => {
         return response.data;
     } catch (error) {
         console.error('Create task error:', error);
-        throw error.response?.data || error.message || 'Failed to create task. Please try again.';
+        throw error;
     }
 };
 
@@ -166,7 +165,7 @@ export const updateTask = async (taskId, taskData) => {
         return response.data;
     } catch (error) {
         console.error('Update task error:', error);
-        throw error.response?.data || error.message || 'Failed to update task. Please try again.';
+        throw error;
     }
 };
 
@@ -177,7 +176,7 @@ export const deleteTask = async (taskId) => {
         return response.data;
     } catch (error) {
         console.error('Delete task error:', error);
-        throw error.response?.data || error.message || 'Failed to delete task. Please try again.';
+        throw error;
     }
 };
 
@@ -188,7 +187,7 @@ export const getTaskById = async (taskId) => {
         return response.data;
     } catch (error) {
         console.error('Get task error:', error);
-        throw error.response?.data || error.message || 'Failed to fetch task. Please try again.';
+        throw error;
     }
 };
 
@@ -203,41 +202,38 @@ export const login = async (credentials) => {
         return response.data;
     } catch (error) {
         console.error('Login error:', error);
-        throw error.response?.data || error.message || 'Login failed. Please try again.';
+        throw error;
     }
 };
 
 export const logout = async () => {
     try {
-        console.log('Logging out...');
         localStorage.removeItem('token');
         return { success: true };
     } catch (error) {
         console.error('Logout error:', error);
-        throw error.response?.data || error.message || 'Logout failed. Please try again.';
+        throw error;
     }
 };
 
 export const addUser = async (userData) => {
     try {
-        console.log('Adding user...', userData);
+        console.log('Adding user:', userData);
         const response = await API.post('/users', userData);
-        console.log('User added successfully:', response.data);
         return response.data;
     } catch (error) {
         console.error('Add user error:', error);
-        throw error.response?.data || error.message || 'Failed to add user. Please try again.';
+        throw error;
     }
 };
 
 export const updateUser = async (userId, userData) => {
     try {
-        console.log('Updating user:', userId, userData);
+        console.log('Updating user:', userId);
         const response = await API.put(`/users/${userId}`, userData);
-        console.log('User updated successfully:', response.data);
         return response.data;
     } catch (error) {
         console.error('Update user error:', error);
-        throw error.response?.data || error.message || 'Failed to update user. Please try again.';
+        throw error;
     }
 };
