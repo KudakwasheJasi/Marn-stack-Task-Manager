@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 21:52:12
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import { Transition } from "@headlessui/react";
 import clsx from "clsx";
 import { Fragment, useRef } from "react";
@@ -16,6 +28,7 @@ import Users from "./pages/Users";
 import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import MobileSidebar from "./components/MobileSidebar";
+import Settings from "./pages/Settings";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -84,10 +97,12 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/status/:status" element={<Tasks />} />
           <Route path="/tasks/:taskId" element={<TaskDetails />} />
           <Route path="/tasks/:taskId/subtask" element={<TaskDetails />} />
           <Route path="/trash" element={<Trash />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

@@ -158,6 +158,11 @@ const Tasks = () => {
     }
   };
 
+  // Filter tasks by status if status param is set
+  const filteredTasks = status
+    ? tasks.filter(task => (task.stage || '').toLowerCase() === status.toLowerCase())
+    : tasks;
+
   if (error) {
     return (
       <div className="w-full py-10 text-center">
@@ -233,7 +238,7 @@ const Tasks = () => {
         )}
       </div>
 
-      {tasks.length === 0 ? (
+      {filteredTasks.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No tasks found. Create a new task to get started!
         </div>
@@ -248,10 +253,10 @@ const Tasks = () => {
           )}
 
           {selected !== 1 ? (
-            <BoardView tasks={tasks} refreshTasks={refreshTasks} />
+            <BoardView tasks={filteredTasks} refreshTasks={refreshTasks} />
           ) : (
             <div className='w-full'>
-              <Table tasks={tasks} refreshTasks={refreshTasks} />
+              <Table tasks={filteredTasks} refreshTasks={refreshTasks} />
             </div>
           )}
         </Tabs>
@@ -261,6 +266,7 @@ const Tasks = () => {
         open={open} 
         setOpen={setOpen} 
         refreshTasks={refreshTasks} 
+        defaultStage={status || undefined}
       />
     </div>
   );

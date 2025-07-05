@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { createTask } from '../../services/api';
 
-const AddTask = ({ open, setOpen, refreshTasks }) => {
+const AddTask = ({ open, setOpen, refreshTasks, defaultStage }) => {
     const [loading, setLoading] = useState(false);
     const {
         register,
@@ -40,7 +40,7 @@ const AddTask = ({ open, setOpen, refreshTasks }) => {
                 title: data.title.trim(),
                 date: new Date(data.date).toISOString(),
                 priority: "normal",
-                stage: "todo",
+                stage: defaultStage || "todo",
                 team: [localStorage.getItem('userId')],
                 activities: [
                     {

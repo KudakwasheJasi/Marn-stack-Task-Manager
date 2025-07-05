@@ -63,17 +63,17 @@ const linkData: SidebarLink[] = [
   },
   {
     label: "Completed",
-    link: "completed/completed",
+    link: "tasks/status/completed",
     icon: <MdTaskAlt />,
   },
   {
     label: "In Progress",
-    link: "in-progress/in progress",
+    link: "tasks/status/in progress",
     icon: <MdOutlinePendingActions />,
   },
   {
     label: "To Do",
-    link: "todo/todo",
+    link: "tasks/status/todo",
     icon: <MdOutlinePendingActions />,
   },
   {
@@ -94,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const path = location.pathname.split("/")[1];
+  const path = location.pathname;
 
   const sidebarLinks = user?.isAdmin ? [...linkData, {
     label: "Settings",
@@ -145,18 +145,40 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
       onClose();
     };
 
+    const handleNav = (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (el.link === 'logout') {
+        handleLogout();
+      } else if (el.link.startsWith('tasks/status/')) {
+        navigate(`/${el.link}`);
+        closeSidebar();
+      } else {
+        navigate(`/${el.link}`);
+        closeSidebar();
+      }
+    };
+
+    // Determine if this link is active
+    const isActive =
+      (el.link === 'tasks' && path === '/tasks') ||
+      (el.link.startsWith('tasks/status/') && path.startsWith(`/${el.link}`)) ||
+      (el.link === 'dashboard' && path === '/dashboard') ||
+      (el.link === 'team' && path === '/team') ||
+      (el.link === 'trashed' && path === '/trashed') ||
+      (el.link === 'settings' && path === '/settings');
+
     return (
-      <Link
-        to={el.link === 'logout' ? '#' : el.link}
-        onClick={el.link === 'logout' ? handleLogout : closeSidebar}
+      <a
+        href={el.link === 'logout' ? '#' : `/${el.link}`}
+        onClick={handleNav}
         className={clsx(
-          "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
-          path === el.link ? "bg-[#2564ed2d]" : ""
+          "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d] transition-colors duration-150",
+          isActive ? "bg-blue-600 text-white font-semibold" : ""
         )}
       >
         {el.icon}
         <span className="text-sm">{el.label}</span>
-      </Link>
+      </a>
     );
   };
   return (
@@ -176,13 +198,6 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
         {sidebarLinks.map((link) => (
           <NavLink el={link} key={link.label} />
         ))}
-      </div>
-
-      <div className=''>
-        <button className='w-full flex gap-2 p-2 items-center text-lg text-gray-800'>
-          <MdSettings />
-          <span>Settings</span>
-        </button>
       </div>
     </div>
   );
