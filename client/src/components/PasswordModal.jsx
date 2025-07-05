@@ -67,7 +67,7 @@ const PasswordModal = ({ open, onClose }) => {
       setLoading(true);
       const response = await updatePassword(formData);
       
-      if (response.success) {
+      if (response.status) {
         toast.success('Password updated successfully');
         audio.playSuccess();
         onClose();

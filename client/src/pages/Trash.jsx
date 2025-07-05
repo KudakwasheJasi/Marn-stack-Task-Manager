@@ -6,6 +6,7 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
   MdOutlineRestore,
+  MdDeleteSweep,
 } from "react-icons/md";
 import { tasks } from "../assets/data";
 import Title from "../components/Title";
@@ -13,6 +14,7 @@ import Button from "../components/Button";
 import { PRIOTITYSTYELS, TASK_TYPE } from "../utils";
 import AddUser from "../components/AddUser";
 import ConfirmatioDialog from "../components/Dialogs";
+import EmptyState from '../components/EmptyState';
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -103,6 +105,8 @@ const Trash = () => {
     </tr>
   );
 
+  const trashedTasks = []; // TODO: Replace with real data
+
   return (
     <>
       <div className='w-full md:px-1 px-0 mb-6'>
@@ -126,14 +130,24 @@ const Trash = () => {
         </div>
         <div className='bg-white px-2 md:px-6 py-4 shadow-md rounded'>
           <div className='overflow-x-auto'>
-            <table className='w-full mb-5'>
-              <TableHeader />
-              <tbody>
-                {tasks?.map((tk, id) => (
-                  <TableRow key={id} item={tk} />
-                ))}
-              </tbody>
-            </table>
+            {trashedTasks.length === 0 ? (
+              <EmptyState
+                icon={<MdDeleteSweep className="text-red-400" />}
+                title="Trash is Empty"
+                message="You have no deleted tasks. Deleted tasks will appear here and can be restored or permanently deleted."
+                actionLabel="Go to Tasks"
+                onAction={() => window.location.href = '/tasks'}
+              />
+            ) : (
+              <table className='w-full mb-5'>
+                <TableHeader />
+                <tbody>
+                  {trashedTasks.map((tk, id) => (
+                    <TableRow key={id} item={tk} />
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

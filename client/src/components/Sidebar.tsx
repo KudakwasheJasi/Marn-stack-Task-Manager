@@ -19,13 +19,14 @@ import {
   MdSettings,
   MdTaskAlt
 } from "react-icons/md";
-import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
+import { FaTasks, FaTrashAlt, FaUsers, FaMoon, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setOpenSidebar, logout as logoutAction } from "../redux/slices/authSlice";
 import clsx from "clsx";
 import { toast } from 'sonner';
 import { logout as logoutAPI } from "../services/api";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface User {
   id: string;
@@ -90,6 +91,7 @@ const linkData: SidebarLink[] = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useSelector((state: { auth: AuthState }) => state.auth);
+  const { theme, toggleTheme } = useTheme();
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -181,6 +183,18 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
       </a>
     );
   };
+
+  // Theme toggle button component
+  const ThemeToggle = () => (
+    <button
+      onClick={toggleTheme}
+      className="w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 dark:text-gray-200 text-base hover:bg-[#2564ed2d] dark:hover:bg-blue-600/20 transition-colors duration-150"
+    >
+      {theme === 'dark' ? <FaSun className="text-yellow-500" /> : <FaMoon className="text-blue-500" />}
+      <span className="text-sm">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+    </button>
+  );
+
   return (
     <div className={clsx(
       'fixed inset-y-0 left-0 z-50 w-full h-full bg-white dark:bg-gray-800 shadow-lg transition-transform duration-300 border-r border-gray-200 dark:border-gray-700',
@@ -198,6 +212,11 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
         {sidebarLinks.map((link) => (
           <NavLink el={link} key={link.label} />
         ))}
+        
+        {/* Theme Toggle Button - appears before Settings */}
+        <div className="mt-4">
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );

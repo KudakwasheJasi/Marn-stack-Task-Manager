@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 06/07/2025 - 00:33:13
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 06/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";

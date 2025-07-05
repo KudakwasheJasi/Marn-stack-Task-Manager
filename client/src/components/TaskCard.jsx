@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 06/07/2025 - 00:48:37
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 06/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import clsx from "clsx";
 import React, { useState } from "react";
 import {
@@ -37,7 +49,7 @@ const TaskCard = ({ task, refreshTasks }) => {
     try {
       setLoading(true);
       const response = await deleteTask(task._id);
-      if (response.data.status) {
+      if (response.status) {
         toast.success('Task deleted successfully');
         if (refreshTasks) refreshTasks();
       }

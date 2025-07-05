@@ -25,6 +25,8 @@ import BoardView from "../components/BoardView";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
 import { getTasks, checkServerHealth } from '../services/api';
+import EmptyState from '../components/EmptyState';
+import { FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
 const TABS = [
   { title: "Board View", icon: <MdGridView /> },
@@ -175,6 +177,36 @@ const Tasks = () => {
     ? tasks.filter(task => (task.stage || '').toLowerCase() === status.toLowerCase())
     : tasks;
 
+  // Helper for empty state content
+  const getEmptyStateProps = () => {
+    if (status.toLowerCase() === 'completed') {
+      return {
+        icon: <FaCheckCircle className="text-green-400" />,
+        title: 'No Completed Tasks',
+        message: 'You have not completed any tasks yet. Once you complete tasks, they will appear here. Get started by creating a new task!',
+        actionLabel: 'Create Task',
+        onAction: () => setOpen(true),
+      };
+    }
+    if (status.toLowerCase() === 'in progress') {
+      return {
+        icon: <FaSpinner className="animate-spin text-yellow-400" />,
+        title: 'No Tasks In Progress',
+        message: 'You have no tasks in progress. Start working on something new!',
+        actionLabel: 'Create Task',
+        onAction: () => setOpen(true),
+      };
+    }
+    // Default empty state
+    return {
+      icon: <IoMdAdd className="text-blue-400" />,
+      title: 'No Tasks Found',
+      message: 'Create a new task to get started!',
+      actionLabel: 'Create Task',
+      onAction: () => setOpen(true),
+    };
+  };
+
   if (error) {
     return (
       <div className="w-full py-10 text-center">
@@ -251,9 +283,7 @@ const Tasks = () => {
       </div>
 
       {filteredTasks.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-          No tasks found. Create a new task to get started!
-        </div>
+        <EmptyState {...getEmptyStateProps()} />
       ) : (
         <Tabs tabs={TABS} setSelected={setSelected}>
           {!status && (
