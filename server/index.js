@@ -7,6 +7,7 @@ import { dbConnection } from './utils/index.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import { protectRoute } from './middlewares/authMiddlewave.js';
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
@@ -109,6 +110,7 @@ app.post('/api/auth/register', authRoutes); // Handle registration directly
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', protectRoute, taskRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/dashboard', protectRoute, dashboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
