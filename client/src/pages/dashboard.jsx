@@ -162,9 +162,10 @@ const UserTable = ({ users }) => {
 };
 const Dashboard = () => {
     const [tasks, setTasks] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+    const [summary, setSummary] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -176,6 +177,7 @@ const Dashboard = () => {
         }
         const data = await response.json();
         setTasks(data.last10Task || []);
+        setSummary(data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
