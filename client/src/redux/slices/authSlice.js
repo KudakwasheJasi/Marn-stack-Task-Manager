@@ -45,7 +45,13 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       state.error = null;
-      localStorage.removeItem('token'); // Clear token from local storage
+      state.loading = false;
+      state.isSidebarOpen = false;
+      // Clear all localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Clear any other auth-related items
+      sessionStorage.clear();
     },
     setOpenSidebar: (state, action) => {
       state.isSidebarOpen = action.payload;
@@ -62,6 +68,14 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
+    },
+    clearAuthState: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.error = null;
+      state.loading = false;
+      state.isSidebarOpen = false;
     }
   },
 });
@@ -77,15 +91,16 @@ export const {
   setLoading,
   updateUser,
   clearError,
-  setUser
+  setUser,
+  clearAuthState
 } = authSlice.actions;
 
-// Selectors
+// Export selectors
 export const selectUser = (state) => state.auth.user;
-export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectToken = (state) => state.auth.token;
-export const selectLoading = (state) => state.auth.loading;
-export const selectError = (state) => state.auth.error;
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectIsSidebarOpen = (state) => state.auth.isSidebarOpen;
+export const selectAuthLoading = (state) => state.auth.loading;
+export const selectAuthError = (state) => state.auth.error;
 
 export default authSlice.reducer;

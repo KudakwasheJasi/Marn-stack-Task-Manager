@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 16:09:29
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
@@ -7,9 +19,11 @@ import { toast } from "sonner";
 import { login } from "../services/api";
 import { useDispatch } from "react-redux";
 import { loginSuccess, setLoading } from "../redux/slices/authSlice";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -86,54 +100,64 @@ const Login = () => {
         </div>
         
         {/* Right side - Login Form */}
-        <div className='w-full md:w-1/3 p-4 md:p-1 flex flex-col justify-center items-center'>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='form-container w-full md:w-[400px] flex flex-col gap-y-8 bg-white px-10 pt-14 pb-14 rounded-lg shadow-md hover:shadow-lg transition-shadow'
-          >
-            <div className=''>
-              <p className='text-blue-600 text-3xl font-bold text-center hover:text-blue-700 transition-colors'>
-                Welcome Back
-              </p>
-              <p className='text-center text-base text-gray-700 mt-2'>
-                Sign in to continue
-              </p>
-            </div>
+        <div className='w-full lg:w-1/3 flex items-center justify-center'>
+          <div className='w-full max-w-md'>
+            <form onSubmit={handleSubmit(onSubmit)} className='bg-white rounded-3xl shadow-2xl p-8 space-y-6'>
+              <div className='text-center mb-8'>
+                <h2 className='text-3xl font-bold text-gray-900 mb-2'>Welcome Back</h2>
+                <p className='text-gray-600'>Sign in to your account to continue</p>
+              </div>
 
-            <div className='flex flex-col gap-y-5'>
               <Textbox
                 type="email"
                 name="email"
-                placeholder="email@example.com"
+                placeholder="Enter your email"
                 label="Email Address"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("email", {
                   required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
-                  },
+                    message: "Invalid email address"
+                  }
                 })}
                 error={errors.email?.message}
                 disabled={isSubmitting}
               />
 
-              <Textbox
-                type="password"
-                name="password"
-                placeholder="Enter password"
-                label="Password"
-                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
-                register={register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters"
-                  }
-                })}
-                error={errors.password?.message}
-                disabled={isSubmitting}
-              />
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    className='w-full px-4 py-3 pr-12 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters"
+                      }
+                    })}
+                    disabled={isSubmitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={isSubmitting}
+                  >
+                    {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                )}
+              </div>
 
               <Button
                 type="submit"
@@ -160,8 +184,8 @@ const Login = () => {
                   Forgot Password?
                 </Link>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>

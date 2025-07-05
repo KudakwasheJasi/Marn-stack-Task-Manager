@@ -1,6 +1,28 @@
+/**
+    * @description      : Modern Password Modal with enhanced UI design
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 15:41:06
+    * 
+    * MODIFICATION LOG
+    * - Version         : 2.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : Complete UI redesign with modern design system
+**/
 import React, { useState } from 'react';
-import { Dialog } from '@headlessui/react';
-import { FaLock, FaKey, FaSave, FaTimes } from 'react-icons/fa';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import { 
+  FaLock, 
+  FaKey, 
+  FaSave, 
+  FaTimes, 
+  FaEye, 
+  FaEyeSlash,
+  FaCheck,
+  FaShieldAlt
+} from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useAudio } from '../services/audioService';
 import { updatePassword } from '../services/api';
@@ -74,139 +96,246 @@ const PasswordModal = ({ open, onClose }) => {
     onClose();
   };
 
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, color: 'gray', text: '' };
+    
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    const strengthMap = {
+      1: { color: 'red', text: 'Very Weak' },
+      2: { color: 'orange', text: 'Weak' },
+      3: { color: 'yellow', text: 'Fair' },
+      4: { color: 'blue', text: 'Good' },
+      5: { color: 'green', text: 'Strong' }
+    };
+
+    return { strength, ...strengthMap[strength] };
+  };
+
+  const passwordStrength = getPasswordStrength(formData.newPassword);
+
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      className="fixed inset-0 z-50 overflow-y-auto"
-    >
-      <div className="min-h-screen px-4 text-center">
-        <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75" />
-
-        <span className="inline-block h-screen align-middle" aria-hidden="true">
-          &#8203;
-        </span>
-
-        <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-          <Dialog.Title
-            as="h3"
-            className="text-lg font-medium leading-6 text-gray-900 mb-4"
+    <Transition appear show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-50 overflow-y-auto"
+        onClose={handleClose}
+      >
+        <div className="min-h-screen px-4 text-center">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            Change Password
-          </Dialog.Title>
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" />
+          </Transition.Child>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-                Current Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
+          <span
+            className="inline-block h-screen align-middle"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            <div className="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl">
+                    <FaShieldAlt className="text-white text-xl" />
+                  </div>
+                  <div>
+                    <Dialog.Title
+                      as="h3"
+                      className="text-2xl font-bold text-gray-900"
+                    >
+                      Change Password
+                    </Dialog.Title>
+                    <p className="text-gray-500 text-sm">Update your account security</p>
+                  </div>
                 </div>
-                <input
-                  type={showCurrentPassword ? 'text' : 'password'}
-                  id="currentPassword"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <button
+                  onClick={handleClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Current Password */}
+                <div className="space-y-2">
+                  <label htmlFor="currentPassword" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <FaLock className="text-blue-500" />
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      id="currentPassword"
+                      name="currentPassword"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                      placeholder="Enter current password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showCurrentPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New Password */}
+                <div className="space-y-2">
+                  <label htmlFor="newPassword" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <FaKey className="text-green-500" />
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      id="newPassword"
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                      placeholder="Enter new password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showNewPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  
+                  {/* Password Strength Indicator */}
+                  {formData.newPassword && (
+                    <div className="space-y-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((level) => (
+                          <div
+                            key={level}
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                              level <= passwordStrength.strength
+                                ? `bg-${passwordStrength.color}-500`
+                                : 'bg-gray-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className={`text-xs font-medium text-${passwordStrength.color}-600`}>
+                        {passwordStrength.text}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <FaKey className="text-green-500" />
+                    Confirm New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                      placeholder="Confirm new password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  
+                  {/* Password Match Indicator */}
+                  {formData.confirmPassword && (
+                    <div className={`flex items-center gap-2 text-sm ${
+                      formData.newPassword === formData.confirmPassword 
+                        ? 'text-green-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {formData.newPassword === formData.confirmPassword ? (
+                        <FaCheck className="w-4 h-4" />
+                      ) : (
+                        <FaTimes className="w-4 h-4" />
+                      )}
+                      {formData.newPassword === formData.confirmPassword 
+                        ? 'Passwords match' 
+                        : 'Passwords do not match'
+                      }
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
                   <button
                     type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="text-gray-400 hover:text-gray-500"
+                    onClick={handleClose}
+                    className="px-6 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-all duration-200 flex items-center gap-2"
                   >
-                    {showCurrentPassword ? 'Hide' : 'Show'}
+                    <FaTimes className="w-4 h-4" />
+                    Cancel
                   </button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaKey className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  id="newPassword"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                  minLength={8}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="text-gray-400 hover:text-gray-500"
+                    type="submit"
+                    disabled={loading || formData.newPassword !== formData.confirmPassword}
+                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:from-green-600 hover:to-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {showNewPassword ? 'Hide' : 'Show'}
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <FaCheck className="w-4 h-4" />
+                        Update Password
+                      </>
+                    )}
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaKey className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                  minLength={8}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    {showConfirmPassword ? 'Hide' : 'Show'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <FaTimes className="w-4 h-4 mr-2" />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <FaSave className="w-4 h-4 mr-2" />
-                {loading ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </form>
+          </Transition.Child>
         </div>
-      </div>
-    </Dialog>
+      </Dialog>
+    </Transition>
   );
 };
 

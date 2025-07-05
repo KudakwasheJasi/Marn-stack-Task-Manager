@@ -194,37 +194,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-    const handleLogout = async () => {
-    try {
-      // Prevent any further data fetching
-      setLoading(true);
-      
-      // Clear user data from localStorage first
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Clear the tasks and summary state
-      setTasks([]);
-      setSummary(null);
-      
-      // Navigate to login page
-      navigate('/login');
-      
-      // Only make API call if we still have a token
-      const token = localStorage.getItem('token');
-      if (token) {
-        await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-          method: 'POST',
-          credentials: 'include'
-        });
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to logout. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleStatusClick = (status) => {
     setSelectedStatus(status);

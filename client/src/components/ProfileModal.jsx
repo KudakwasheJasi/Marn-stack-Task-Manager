@@ -1,6 +1,29 @@
+/**
+ * @description      : Modern Profile Modal with enhanced UI design
+ * @author           : kudakwashe Ellijah
+ * @group            : 
+ * @created          : 05/07/2025 - 15:55:38
+ * 
+ * MODIFICATION LOG
+ * - Version         : 2.0.0
+ * - Date            : 05/07/2025
+ * - Author          : kudakwashe Ellijah
+ * - Modification    : Complete UI redesign with modern design system
+**/
 import React, { useState } from 'react';
-import { Dialog } from '@headlessui/react';
-import { FaUserEdit, FaCamera, FaSave, FaTimes } from 'react-icons/fa';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import { 
+  FaUserEdit, 
+  FaCamera, 
+  FaSave, 
+  FaTimes, 
+  FaEnvelope, 
+  FaPhone, 
+  FaUser,
+  FaEdit,
+  FaCheck
+} from 'react-icons/fa';
 import { toast } from 'sonner';
 import { useAudio } from '../services/audioService';
 import { updateUser, uploadProfileImage } from '../services/api';
@@ -16,6 +39,7 @@ const ProfileModal = ({ open, onClose, user }) => {
     bio: user?.bio || '',
   });
   const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +57,7 @@ const ProfileModal = ({ open, onClose, user }) => {
         return;
       }
       setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -82,133 +107,228 @@ const ProfileModal = ({ open, onClose, user }) => {
       bio: user?.bio || '',
     });
     setProfileImage(null);
+    setImagePreview(null);
     onClose();
   };
 
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      className="fixed inset-0 z-50 overflow-y-auto"
-    >
-      <div className="min-h-screen px-4 text-center">
-        <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75" />
-
-        {/* This element is to trick the browser into centering the modal contents. */}
-        <span className="inline-block h-screen align-middle" aria-hidden="true">
-          &#8203;
-        </span>
-
-        <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-          <Dialog.Title
-            as="h3"
-            className="text-lg font-medium leading-6 text-gray-900 mb-4"
+    <Transition appear show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-50 overflow-y-auto"
+        onClose={handleClose}
+      >
+        <div className="min-h-screen px-4 text-center">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            Edit Profile
-          </Dialog.Title>
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" />
+          </Transition.Child>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex justify-center mb-4">
-              <div className="relative">
-                <img
-                  src={profileImage ? URL.createObjectURL(profileImage) : user?.imageUrl || '/default-avatar.png'}
-                  alt="Profile"
-                  className="w-32 h-32 rounded-full object-cover"
-                />
-                <label
-                  htmlFor="profileImage"
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700"
+          {/* This element is to trick the browser into centering the modal contents. */}
+          <span
+            className="inline-block h-screen align-middle"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            <div className="inline-block w-full max-w-2xl p-6 my-8 text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl">
+                    <FaUserEdit className="text-white text-xl" />
+                  </div>
+                  <div>
+                    <Dialog.Title
+                      as="h3"
+                      className="text-2xl font-bold text-gray-900"
+                    >
+                      Edit Profile
+                    </Dialog.Title>
+                    <p className="text-gray-500 text-sm">Update your personal information</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
                 >
-                  <FaCamera className="w-4 h-4" />
-                </label>
-                <input
-                  type="file"
-                  id="profileImage"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+                  <FaTimes className="text-xl" />
+                </button>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Profile Image Section */}
+                <div className="flex flex-col items-center">
+                  <div className="relative group">
+                    <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-100 group-hover:ring-blue-200 transition-all duration-300">
+                      {imagePreview || user?.imageUrl ? (
+                        <img
+                          src={imagePreview || user.imageUrl}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                          <span className="text-white text-3xl font-bold">
+                            {getInitials(user?.name)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Camera Icon Overlay */}
+                    <label
+                      htmlFor="profileImage"
+                      className="absolute bottom-2 right-2 bg-white text-blue-600 p-3 rounded-full cursor-pointer hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-200 group-hover:scale-110"
+                    >
+                      <FaCamera className="w-4 h-4" />
+                    </label>
+                    <input
+                      type="file"
+                      id="profileImage"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <p className="text-gray-500 text-sm mt-3">Click the camera icon to change your photo</p>
+                </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
+                {/* Form Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <FaUser className="text-blue-500" />
+                      Full Name
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                  </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Phone
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
+                  {/* Email Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <FaEnvelope className="text-blue-500" />
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
 
-            <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
-                Bio
-              </label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                rows="3"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
+                  {/* Phone Field */}
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <FaPhone className="text-blue-500" />
+                      Phone Number
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                        placeholder="Enter your phone number"
+                      />
+                    </div>
+                  </div>
 
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <FaTimes className="w-4 h-4 mr-2" />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <FaSave className="w-4 h-4 mr-2" />
-                {loading ? 'Saving...' : 'Save'}
-              </button>
+                  {/* Bio Field */}
+                  <div className="space-y-2 md:col-span-2">
+                    <label htmlFor="bio" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <FaEdit className="text-blue-500" />
+                      Bio
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        id="bio"
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        rows="4"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white resize-none"
+                        placeholder="Tell us about yourself..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="px-6 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-all duration-200 flex items-center gap-2"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FaCheck className="w-4 h-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </Transition.Child>
         </div>
-      </div>
-    </Dialog>
+      </Dialog>
+    </Transition>
   );
 };
 

@@ -10,9 +10,10 @@ import {
 import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { setOpenSidebar } from "../redux/slices/authSlice";
+import { setOpenSidebar, logout as logoutAction } from "../redux/slices/authSlice";
 import clsx from "clsx";
 import { toast } from 'sonner';
+import { logout as logoutAPI } from "../services/api";
 
 interface User {
   id: string;
@@ -112,12 +113,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 const NavLink: React.FC<NavLinkProps> = ({ el }) => {
     const handleLogout = async () => {
       try {
-        // Clear user data from localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // Call the centralized logout API function
+        await logoutAPI();
+        
+        // Dispatch Redux logout action to clear state
+        dispatch(logoutAction());
         
         // Navigate to login page
         navigate('/login');
+        
+        toast.success('Successfully logged out');
       } catch (error) {
         console.error('Logout error:', error);
         toast.error('Failed to logout. Please try again.');

@@ -72,6 +72,27 @@ API.interceptors.response.use(
 
         originalRequest._retry = originalRequest._retry || 0;
 
+        // Handle 401 Unauthorized errors
+        if (error.response?.status === 401) {
+            console.log('Authentication failed, clearing user session');
+            
+            // Clear all authentication data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+            
+            // Reset API headers
+            API.defaults.headers.common = {};
+            API.defaults.headers.Authorization = '';
+            
+            // Redirect to login page if we're not already there
+            if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                window.location.href = '/login';
+            }
+            
+            return Promise.reject(new Error('Authentication failed. Please login again.'));
+        }
+
         if (error.code === 'ERR_NETWORK' && originalRequest._retry < 3) {
             originalRequest._retry += 1;
             console.log(`Retrying request (${originalRequest._retry}/3)...`);
@@ -88,11 +109,6 @@ API.interceptors.response.use(
             } catch (healthError) {
                 throw new Error('Unable to connect to server');
             }
-        }
-
-        if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            return Promise.reject(error);
         }
 
         return Promise.reject(error);
@@ -266,16 +282,29 @@ export const login = async (credentials) => {
 
 export const logout = async () => {
     try {
-        // Clear token from localStorage
+        // Clear token from localStorage first
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         
-        // Clear any pending requests
-        API.interceptors.request.eject(API.interceptors.request.handlers[0]);
-        API.interceptors.response.eject(API.interceptors.response.handlers[0]);
+        // Clear sessionStorage
+        sessionStorage.clear();
         
-        // Reset API instance to ensure clean state
+        // Cancel any pending requests
+        if (API.defaults.cancelToken) {
+            API.defaults.cancelToken.cancel('Logout requested');
+        }
+        
+        // Reset API instance headers
         API.defaults.headers.common = {};
+        API.defaults.headers.Authorization = '';
+        
+        // Try to call logout endpoint (but don't fail if it doesn't work)
+        try {
+            await API.post('/auth/logout');
+        } catch (error) {
+            console.log('Logout API call failed, but continuing with local cleanup');
+        }
+        
         audio.playNotification();
         
         return { success: true };
