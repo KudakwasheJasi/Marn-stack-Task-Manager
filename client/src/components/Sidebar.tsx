@@ -1,16 +1,18 @@
 import React from "react";
+import { IoLogOutOutline } from "react-icons/io5";
 import {
   MdDashboard,
   MdOutlineAddTask,
   MdOutlinePendingActions,
   MdSettings,
-  MdTaskAlt,
+  MdTaskAlt
 } from "react-icons/md";
 import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setOpenSidebar } from "../redux/slices/authSlice";
 import clsx from "clsx";
+import { toast } from 'sonner';
 
 interface User {
   id: string;
@@ -75,13 +77,29 @@ const linkData: SidebarLink[] = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useSelector((state: { auth: AuthState }) => state.auth);
-
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const path = location.pathname.split("/")[1];
 
-  const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, 5);
+  const sidebarLinks = user?.isAdmin ? [...linkData, {
+    label: "Settings",
+    link: "settings",
+    icon: <MdSettings />
+  }, {
+    label: "Logout",
+    link: "logout",
+    icon: <IoLogOutOutline />
+  }] : [...linkData.slice(0, 5), {
+    label: "Settings",
+    link: "settings",
+    icon: <MdSettings />
+  }, {
+    label: "Logout",
+    link: "logout",
+    icon: <IoLogOutOutline />
+  }];
 
   const closeSidebar = () => {
     onClose();
@@ -92,17 +110,35 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ el }) => {
+    const handleLogout = async () => {
+      try {
+        // Clear user data from localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Navigate to login page
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout error:', error);
+        toast.error('Failed to logout. Please try again.');
+      }
+    };
+
+    const closeSidebar = () => {
+      onClose();
+    };
+
     return (
       <Link
-        to={el.link}
-        onClick={closeSidebar}
+        to={el.link === 'logout' ? '#' : el.link}
+        onClick={el.link === 'logout' ? handleLogout : closeSidebar}
         className={clsx(
           "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
-          path === el.link.split("/")[0] ? "bg-blue-700 text-neutral-100" : ""
+          path === el.link ? "bg-[#2564ed2d]" : ""
         )}
       >
         {el.icon}
-        <span className='hover:text-[#2564ed]'>{el.label}</span>
+        <span className="text-sm">{el.label}</span>
       </Link>
     );
   };

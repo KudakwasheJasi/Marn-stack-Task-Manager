@@ -1,14 +1,17 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Transition, Dialog } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { FaUser, FaUserLock } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getInitials } from "../utils";
+import ProfileModal from "./ProfileModal";
+import PasswordModal from "./PasswordModal";
 
 const UserAvatar = () => {
   const [open, setOpen] = useState(false);
-  const [openPassword, setOpenPassword] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -43,10 +46,20 @@ const UserAvatar = () => {
       <div>
         <Menu as='div' className='relative inline-block text-left'>
           <div>
-            <Menu.Button className='w-10 h-10 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-blue-600'>
-              <span className='text-white font-semibold'>
-                {getInitials(user?.name)}
-              </span>
+            <Menu.Button className='w-10 h-10 2xl:w-12 2xl:h-12 items-center justify-center rounded-full'>
+              {user?.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={user.name}
+                  className='w-full h-full rounded-full object-cover'
+                />
+              ) : (
+                <div className='w-full h-full bg-blue-600 rounded-full flex items-center justify-center'>
+                  <span className='text-white font-semibold'>
+                    {getInitials(user?.name)}
+                  </span>
+                </div>
+              )}
             </Menu.Button>
           </div>
 
@@ -64,7 +77,7 @@ const UserAvatar = () => {
                 <Menu.Item>
                   {({ active }) => (
                     <button
-                      onClick={() => setOpen(true)}
+                      onClick={() => setProfileOpen(true)}
                       className='text-gray-700 group flex w-full items-center rounded-md px-2 py-2 text-base'
                     >
                       <FaUser className='mr-2' aria-hidden='true' />
@@ -76,8 +89,8 @@ const UserAvatar = () => {
                 <Menu.Item>
                   {({ active }) => (
                     <button
-                      onClick={() => setOpenPassword(true)}
-                      className={`tetx-gray-700 group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                      onClick={() => setPasswordOpen(true)}
+                      className='text-gray-700 group flex w-full items-center rounded-md px-2 py-2 text-base'
                     >
                       <FaUserLock className='mr-2' aria-hidden='true' />
                       Change Password
@@ -102,6 +115,8 @@ const UserAvatar = () => {
           </Transition>
         </Menu>
       </div>
+      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} user={user} />
+      <PasswordModal open={passwordOpen} onClose={() => setPasswordOpen(false)} />
     </>
   );
 };

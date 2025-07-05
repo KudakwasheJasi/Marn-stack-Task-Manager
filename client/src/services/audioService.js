@@ -1,22 +1,21 @@
-export const useAudio = () => ({
-  playSuccess: () => {
-    const audio = new Audio('/alarm-sound.mp3');
-    audio.play().catch(error => {
-      console.error('Error playing success sound:', error);
-    });
-  },
+export const useAudio = () => {
+  let currentAudio = null;
 
-  playError: () => {
-    const audio = new Audio('/alarm-sound.mp3');
-    audio.play().catch(error => {
-      console.error('Error playing error sound:', error);
-    });
-  },
+  const playOnce = (soundPath) => {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
 
-  playNotification: () => {
-    const audio = new Audio('/alarm-sound.mp3');
-    audio.play().catch(error => {
-      console.error('Error playing notification sound:', error);
+    currentAudio = new Audio(soundPath);
+    currentAudio.play().catch(error => {
+      console.error('Error playing sound:', error);
     });
-  }
-});
+  };
+
+  return {
+    playSuccess: () => playOnce('/alarm-sound.mp3'),
+    playError: () => playOnce('/alarm-sound.mp3'),
+    playNotification: () => playOnce('/alarm-sound.mp3')
+  };
+};

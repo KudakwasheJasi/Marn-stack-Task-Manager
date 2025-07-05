@@ -297,13 +297,36 @@ export const addUser = async (userData) => {
     }
 };
 
+export const uploadProfileImage = async (formData) => {
+    try {
+        const response = await API.post('/users/upload-profile-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        handleApiError('uploadProfileImage', error);
+        throw error;
+    }
+};
+
+export const updatePassword = async (passwordData) => {
+    try {
+        const response = await API.put('/users/change-password', passwordData);
+        return response.data;
+    } catch (error) {
+        handleApiError('updatePassword', error);
+        throw error;
+    }
+};
+
 export const updateUser = async (userId, userData) => {
     try {
-        console.log('Updating user:', userId);
         const response = await API.put(`/users/${userId}`, userData);
         return response.data;
     } catch (error) {
-        console.error('Update user error:', error);
+        handleApiError('updateUser', error);
         throw error;
     }
 };

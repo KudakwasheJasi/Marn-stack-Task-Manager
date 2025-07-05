@@ -196,20 +196,28 @@ const Dashboard = () => {
 
     const handleLogout = async () => {
     try {
+      // Prevent any further data fetching
       setLoading(true);
       
-      // Make API call to logout
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      // Clear user data from localStorage
+      // Clear user data from localStorage first
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       
+      // Clear the tasks and summary state
+      setTasks([]);
+      setSummary(null);
+      
       // Navigate to login page
       navigate('/login');
+      
+      // Only make API call if we still have a token
+      const token = localStorage.getItem('token');
+      if (token) {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to logout. Please try again.');
@@ -322,14 +330,6 @@ const Dashboard = () => {
     <div className='h-full py-4'>
       <div className='flex justify-between items-center mb-8'>
         <h1 className='text-2xl font-bold'>Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className='flex items-center gap-2 px-4 py-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors'
-          disabled={loading}
-        >
-          <IoLogOutOutline className='text-lg' />
-          {loading ? 'Logging out...' : 'Logout'}
-        </button>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-5'>
         {stats.map(({ icon, bg, label, total, status }, index) => (
