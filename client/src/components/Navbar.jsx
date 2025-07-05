@@ -4,10 +4,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOpenSidebar } from "../redux/slices/authSlice";
 import UserAvatar from "./UserAvatar";
 import NotificationPanel from "./NotificationPanel";
+import { createTestNotification } from "../services/api";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+
+  const testNotification = async () => {
+    try {
+      console.log('Creating test notification from Navbar...');
+      const result = await createTestNotification();
+      console.log('Test notification result:', result);
+      alert('Test notification created! Check the notification panel.');
+    } catch (error) {
+      console.error('Error creating test notification:', error);
+      alert('Error creating test notification: ' + error.message);
+    }
+  };
 
   return (
     <div className='flex justify-between items-center bg-white px-4 py-3 2xl:py-4 sticky z-10 top-0'>
@@ -31,6 +44,13 @@ const Navbar = () => {
       </div>
 
       <div className='flex gap-2 items-center'>
+        <button
+          onClick={testNotification}
+          className='px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600'
+          title='Test Notification'
+        >
+          Test
+        </button>
         <NotificationPanel />
 
         <UserAvatar />
