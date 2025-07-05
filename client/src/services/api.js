@@ -15,6 +15,9 @@
  * - Modification    : Updated API configuration to use the correct URL with /api prefix
 **/
 import axios from 'axios';
+import { useAudio } from './audioService';
+
+const audio = useAudio();
 
 const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
@@ -156,10 +159,12 @@ export const createTask = async (taskData) => {
     try {
         console.log('Creating task:', taskData);
         const response = await API.post('/tasks/create', taskData);
+        audio.playSuccess();
         return response.data;
     } catch (error) {
         console.error('Create task error:', error);
-        throw error;
+        audio.playError();
+        throw new Error('Failed to create task. Please try again.');
     }
 };
 
@@ -167,10 +172,12 @@ export const updateTask = async (taskId, taskData) => {
     try {
         console.log('Updating task:', taskId);
         const response = await API.put(`/tasks/${taskId}`, taskData);
+        audio.playSuccess();
         return response.data;
     } catch (error) {
         console.error('Update task error:', error);
-        throw error;
+        audio.playError();
+        throw new Error('Failed to update task. Please try again.');
     }
 };
 
@@ -178,10 +185,12 @@ export const deleteTask = async (taskId) => {
     try {
         console.log('Deleting task:', taskId);
         const response = await API.delete(`/tasks/${taskId}`);
+        audio.playSuccess();
         return response.data;
     } catch (error) {
         console.error('Delete task error:', error);
-        throw error;
+        audio.playError();
+        throw new Error('Failed to delete task. Please try again.');
     }
 };
 
@@ -217,6 +226,7 @@ export const login = async (credentials) => {
             
             if (status && status === true && token && user) {
                 localStorage.setItem('token', token);
+                audio.playSuccess();
                 return { token, user };
             } else if (data) {
                 throw new Error(data.message || 'Invalid login response format');
@@ -236,6 +246,7 @@ export const login = async (credentials) => {
         }
     } catch (error) {
         console.error('Login error:', error);
+        audio.playError();
         let errorMessage = error.response?.data?.message;
         
         if (!errorMessage) {
@@ -255,11 +266,23 @@ export const login = async (credentials) => {
 
 export const logout = async () => {
     try {
+        // Clear token from localStorage
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Clear any pending requests
+        API.interceptors.request.eject(API.interceptors.request.handlers[0]);
+        API.interceptors.response.eject(API.interceptors.response.handlers[0]);
+        
+        // Reset API instance to ensure clean state
+        API.defaults.headers.common = {};
+        audio.playNotification();
+        
         return { success: true };
     } catch (error) {
         console.error('Logout error:', error);
-        throw error;
+        audio.playError();
+        throw new Error('Failed to logout. Please try again.');
     }
 };
 
