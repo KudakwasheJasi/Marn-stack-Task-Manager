@@ -101,7 +101,7 @@ const TaskDialog = ({ task, refetchTasks }) => {
     {
       label: "Add Sub-Task",
       icon: <MdAdd className='mr-2 h-5 w-5 text-purple-500' aria-hidden='true' />,
-      onClick: () => setOpen(true),
+      onClick: () => navigate(`/task/${task._id}/subtask`),
     },
     {
       label: "Duplicate",
@@ -187,12 +187,7 @@ const TaskDialog = ({ task, refetchTasks }) => {
         refetchTasks={refetchTasks}
       />
 
-      <AddSubTask 
-        open={open} 
-        setOpen={setOpen} 
-        id={task._id}
-        refetchTasks={refetchTasks}
-      />
+
 
       <ConfirmationDialog
         open={openDialog}

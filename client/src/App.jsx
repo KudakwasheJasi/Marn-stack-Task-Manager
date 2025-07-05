@@ -9,7 +9,7 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar.tsx";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import TaskDetails from "./pages/TaskDetails";
+import TaskDetails from "./components/task/TaskDetails";
 import Tasks from "./pages/Tasks";
 import Trash from "./pages/Trash";
 import Users from "./pages/Users";
@@ -85,6 +85,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/tasks/:taskId" element={<TaskDetails />} />
+          <Route path="/tasks/:taskId/subtask" element={<TaskDetails />} />
           <Route path="/trash" element={<Trash />} />
           <Route path="/users" element={<Users />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

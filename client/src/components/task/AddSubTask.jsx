@@ -4,12 +4,12 @@ import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import Button from "../Button";
 import { toast } from 'sonner';
-import { useState, useCallback, useEffect } from 'react';
-
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { createTask } from '../../services/api';
 
 const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
   const [loading, setLoading] = useState(false);
-  const alarmSound = new Audio('/path/to/alarm-sound.mp3'); // Adjust the path as necessary
+  const audioRef = useRef(null);
 
   const {
     register,
@@ -58,7 +58,12 @@ const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
       
       // Show notification and play sound
       showNotification("Sub-task Created", "A new sub-task has been created!");
-      alarmSound.play();
+      
+      const audio = audioRef.current;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(error => console.error('Error playing sound:', error));
+      }
 
       if (refetchTasks) {
         await refetchTasks();
@@ -90,14 +95,16 @@ const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
   }, []);
 
   return (
-    <ModalWrapper open={open} setOpen={setOpen}>
-      <form onSubmit={handleSubmit(handleOnSubmit)} className='space-y-6'>
-        <Dialog.Title
-          as='h2'
-          className='text-base font-bold leading-6 text-gray-900'
-        >
-          ADD SUB-TASK
-        </Dialog.Title>
+    <>
+      <audio ref={audioRef} src="/alarm-sound.mp3" preload="auto" />
+      <ModalWrapper open={open} setOpen={setOpen}>
+        <form onSubmit={handleSubmit(handleOnSubmit)} className='space-y-6'>
+          <Dialog.Title
+            as='h2'
+            className='text-base font-bold leading-6 text-gray-900'
+          >
+            ADD SUB-TASK
+          </Dialog.Title>
 
         <div className='space-y-4'>
           <Textbox
@@ -186,6 +193,7 @@ const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
         </div>
       </form>
     </ModalWrapper>
+    </>
   );
 };
 
