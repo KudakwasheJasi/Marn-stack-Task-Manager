@@ -19,7 +19,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { FaTasks, FaTrash, FaCopy, FaEdit, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getNotifications, markNotificationRead, createTestNotification } from "../services/api";
+import { getNotifications, markNotificationRead } from "../services/api";
 
 const ICONS = {
   alert: (
@@ -131,18 +131,6 @@ const NotificationPanel = () => {
     }
   };
 
-  const testNotification = async () => {
-    try {
-      console.log('Creating test notification...');
-      const result = await createTestNotification();
-      console.log('Test notification result:', result);
-      // Refresh notifications after creating test
-      await fetchNotifications();
-    } catch (error) {
-      console.error('Error creating test notification:', error);
-    }
-  };
-
   const callsToAction = [
     { name: "Cancel", href: "#", icon: "" },
     {
@@ -234,12 +222,6 @@ const NotificationPanel = () => {
                         {item.name}
                       </button>
                     ))}
-                    <button
-                      onClick={testNotification}
-                      className='text-sm font-semibold text-blue-600 hover:text-blue-700'
-                    >
-                      Test Notification
-                    </button>
                   </div>
                 </div>
               ) : (
@@ -248,12 +230,6 @@ const NotificationPanel = () => {
                     <IoIosNotificationsOutline className='mx-auto h-12 w-12 text-gray-400' />
                     <h3 className='mt-2 text-sm font-semibold text-gray-900'>No notifications</h3>
                     <p className='mt-1 text-sm text-gray-500'>You're all caught up!</p>
-                    <button
-                      onClick={testNotification}
-                      className='mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium'
-                    >
-                      Test Notification
-                    </button>
                   </div>
                 </div>
               )
