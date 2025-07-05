@@ -46,12 +46,25 @@ const ICONS = {
 const NotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const alarmSound = new Audio('./alarm-sound.mp3'); // Using relative path
+  const [alarmSound, setAlarmSound] = useState(null);
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
       Notification.requestPermission();
     }
+
+    // Create and configure audio element
+    const audio = new Audio('/alarm-sound.mp3');
+    audio.preload = 'auto';
+    setAlarmSound(audio);
+
+    // Cleanup on unmount
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
   }, []);
 
   const showNotification = (title, body) => {
@@ -68,12 +81,25 @@ const NotificationPanel = () => {
 
   const handleTaskCreated = () => {
     showNotification("Task Created", "A new task has been created!");
-    alarmSound.play();
+    playSound();
   };
 
   const handleTaskDeleted = () => {
     showNotification("Task Deleted", "A task has been deleted!");
-    alarmSound.play();
+    playSound();
+  };
+
+  const playSound = () => {
+    if (alarmSound) {
+      // Pause any existing sound
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+      
+      // Play new sound
+      alarmSound.play().catch(error => {
+        console.error('Error playing sound:', error);
+      });
+    }
   };
 
   const callsToAction = [
