@@ -15,7 +15,7 @@ const UserList = ({ setTeam, team, disabled = false, error }) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/users`);
+      const response = await fetch('https://marn-stack-task-manager.onrender.com/api/users');
       const data = await response.json();
       
       if (Array.isArray(data)) {

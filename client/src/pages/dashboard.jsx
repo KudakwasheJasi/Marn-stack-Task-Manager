@@ -171,7 +171,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/dashboard');
+        const response = await fetch('https://marn-stack-task-manager.onrender.com/api/dashboard');
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
         }
@@ -194,7 +194,7 @@ const Dashboard = () => {
       setLoading(true);
       
       // Make API call to logout
-      await fetch('/api/auth/logout', {
+      await fetch('https://marn-stack-task-manager.onrender.com/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });
