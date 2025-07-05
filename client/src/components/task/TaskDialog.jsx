@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiTwotoneFolderOpen } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
@@ -111,7 +111,7 @@ const TaskDialog = ({ task, refetchTasks }) => {
 
   return (
     <>
-      <audio ref={audioRef} src="/public/alarm-sound.mp3" preload="auto" />
+      <audio ref={audioRef} src="./alarm-sound.mp3" preload="auto" />
       <div className="relative">
         <Menu as='div' className='relative inline-block text-left'>
           <Menu.Button 

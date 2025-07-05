@@ -46,7 +46,7 @@ const ICONS = {
 const NotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const alarmSound = new Audio('/public/alarm-sound.mp3'); // Using correct public path
+  const alarmSound = new Audio('./alarm-sound.mp3'); // Using relative path
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
