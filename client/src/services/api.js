@@ -352,7 +352,7 @@ export const updatePassword = async (passwordData) => {
 
 export const updateUser = async (userId, userData) => {
     try {
-        const response = await API.put(`/users/${userId}`, userData);
+        const response = await API.put('/users/profile', userData);
         return response.data;
     } catch (error) {
         handleApiError('updateUser', error);

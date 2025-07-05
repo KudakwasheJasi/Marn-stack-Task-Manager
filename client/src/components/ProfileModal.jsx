@@ -13,6 +13,7 @@
 import React, { useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import { useDispatch } from 'react-redux';
 import { 
   FaUserEdit, 
   FaCamera, 
@@ -27,8 +28,10 @@ import {
 import { toast } from 'sonner';
 import { useAudio } from '../services/audioService';
 import { updateUser, uploadProfileImage } from '../services/api';
+import { updateUser as updateUserAction } from '../redux/slices/authSlice';
 
 const audio = useAudio();
+const dispatch = useDispatch();
 
 const ProfileModal = ({ open, onClose, user }) => {
   const [loading, setLoading] = useState(false);
@@ -78,6 +81,7 @@ const ProfileModal = ({ open, onClose, user }) => {
 
       // Update user profile
       const userData = {
+        _id: user._id,
         ...formData,
         imageUrl
       };
@@ -86,6 +90,9 @@ const ProfileModal = ({ open, onClose, user }) => {
       // Update local storage
       const updatedUser = { ...user, ...userData };
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Update Redux state
+      dispatch(updateUserAction(userData));
       
       toast.success('Profile updated successfully');
       audio.playSuccess();
