@@ -46,6 +46,18 @@ const userSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    imageUrl: {
+        type: String,
+        default: null
+    },
+    phone: {
+        type: String,
+        default: null
+    },
+    bio: {
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 

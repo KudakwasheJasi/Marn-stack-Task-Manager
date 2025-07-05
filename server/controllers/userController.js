@@ -138,7 +138,7 @@ export const getNotificationsList = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
-    const { _id } = req.body;
+    const { _id, name, email, phone, bio, imageUrl } = req.body;
 
     const id =
       isAdmin && userId === _id
@@ -150,13 +150,21 @@ export const updateUserProfile = async (req, res) => {
     const user = await User.findById(id);
 
     if (user) {
-      user.name = req.body.name || user.name;
+      // Update basic fields
+      user.name = name || user.name;
+      user.email = email || user.email;
       user.title = req.body.title || user.title;
       user.role = req.body.role || user.role;
+      
+      // Update new fields
+      if (phone !== undefined) user.phone = phone;
+      if (bio !== undefined) user.bio = bio;
+      if (imageUrl !== undefined) user.imageUrl = imageUrl;
 
       const updatedUser = await user.save();
 
-      user.password = undefined;
+      // Remove password from response
+      updatedUser.password = undefined;
 
       res.status(201).json({
         status: true,
