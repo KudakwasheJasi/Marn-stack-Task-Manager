@@ -115,25 +115,32 @@ const Register = () => {
         </div>
 
         {/* Right side - Form */}
-        <div className='w-full lg:w-1/3 flex items-center justify-center'>
-          <div className='w-full max-w-md'>
-            <form onSubmit={handleSubmit(onSubmit)} className='bg-white rounded-3xl shadow-2xl p-8 space-y-6'>
-              <div className='text-center mb-8'>
-                <h2 className='text-3xl font-bold text-gray-900 mb-2'>Create Account</h2>
-                <p className='text-gray-600'>Join us and start managing your tasks</p>
-              </div>
+        <div className='w-full md:w-1/3 p-4 md:p-1 flex flex-col justify-center items-center'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='form-container w-full md:w-[400px] flex flex-col gap-y-8 bg-white px-10 pt-14 pb-14 rounded-lg shadow-md hover:shadow-lg transition-shadow'
+          >
+            <div className=''>
+              <p className='text-blue-600 text-3xl font-bold text-center hover:text-blue-700 transition-colors'>
+                Create Account
+              </p>
+              <p className='text-center text-base text-gray-700 mt-2'>
+                Get started with task management
+              </p>
+            </div>
 
+            <div className='flex flex-col gap-y-5'>
               <Textbox
                 type="text"
                 name="name"
-                placeholder="Enter your full name"
-                label="Full Name"
+                placeholder="Enter username"
+                label="Username"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("name", {
-                  required: "Full name is required",
+                  required: "Username is required",
                   minLength: {
                     value: 2,
-                    message: "Name must be at least 2 characters"
+                    message: "Name must be at least 2 characters long"
                   }
                 })}
                 error={errors.name?.message}
@@ -143,7 +150,7 @@ const Register = () => {
               <Textbox
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="Email Address"
                 label="Email Address"
                 className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
                 register={register("email", {
@@ -157,89 +164,61 @@ const Register = () => {
                 disabled={loading}
               />
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    placeholder="Create a password"
-                    className='w-full px-4 py-3 pr-12 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters"
-                      }
-                    })}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    disabled={loading}
-                  >
-                    {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Confirm your password"
-                    className='w-full px-4 py-3 pr-12 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
-                    {...register("confirmPassword", {
-                      required: "Please confirm your password",
-                      validate: value => value === password || "Passwords don't match"
-                    })}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                    disabled={loading}
-                  >
-                    {showConfirmPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                label={loading ? 'Creating Account...' : 'Register'}
-                className='w-full h-12 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold transform hover:scale-[1.02] active:scale-[0.98]'
+              <Textbox
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                label="Password"
+                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
+                register={register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters long"
+                  },
+                  pattern: {
+                    value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/,
+                    message: "Password must contain at least one letter and one number"
+                  }
+                })}
+                error={errors.password?.message}
                 disabled={loading}
+                icon={showPassword ? <FaEyeSlash onClick={() => setShowPassword(!showPassword)} className="cursor-pointer" /> : <FaEye onClick={() => setShowPassword(!showPassword)} className="cursor-pointer" />}
               />
 
-              <p className="text-center text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link
-                  to="/log-in"
-                  className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
-                >
-                  Login here
-                </Link>
-              </p>
-            </form>
-          </div>
+              <Textbox
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                label="Confirm Password"
+                className='w-full rounded-full focus:ring-2 focus:ring-blue-500'
+                register={register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: value => value === password || "Passwords don't match"
+                })}
+                error={errors.confirmPassword?.message}
+                disabled={loading}
+                icon={showConfirmPassword ? <FaEyeSlash onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="cursor-pointer" /> : <FaEye onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="cursor-pointer" />}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              label={loading ? 'Creating Account...' : 'Register'}
+              className='w-full h-12 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold transform hover:scale-[1.02] active:scale-[0.98]'
+              disabled={loading}
+            />
+
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link
+                to="/log-in"
+                className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
+              >
+                Login here
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </div>

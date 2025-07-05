@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 16:13:13
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {

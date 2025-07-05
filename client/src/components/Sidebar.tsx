@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 16:14:13
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import React from "react";
 import { IoLogOutOutline } from "react-icons/io5";
 import {
