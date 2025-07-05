@@ -2,6 +2,7 @@ import express from "express";
 import taskRoutes from "./taskRoutes.js";
 import userRoutes from "./userRoutes.js";
 import authRoutes from "./authRoutes.js";
+import dashboardRoutes from "./dashboardRoutes.js";
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ router.get('/test-routes', (req, res) => {
 router.use("/tasks", taskRoutes);  // Changed from /task to /tasks
 router.use("/users", userRoutes);  // Changed from /user to /users
 router.use("/auth", authRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;
