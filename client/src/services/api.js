@@ -392,3 +392,14 @@ export const createTestNotification = async () => {
         throw error;
     }
 };
+
+// Test function to clear test notifications
+export const clearTestNotifications = async () => {
+    try {
+        const response = await API.delete('/users/clear-test-notifications');
+        return response.data;
+    } catch (error) {
+        handleApiError('clearTestNotifications', error);
+        throw error;
+    }
+};

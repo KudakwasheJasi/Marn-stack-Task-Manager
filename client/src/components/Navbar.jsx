@@ -1,10 +1,22 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 19:07:22
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import React from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { setOpenSidebar } from "../redux/slices/authSlice";
 import UserAvatar from "./UserAvatar";
 import NotificationPanel from "./NotificationPanel";
-import { createTestNotification } from "../services/api";
+import { createTestNotification, clearTestNotifications } from "../services/api";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -19,6 +31,18 @@ const Navbar = () => {
     } catch (error) {
       console.error('Error creating test notification:', error);
       alert('Error creating test notification: ' + error.message);
+    }
+  };
+
+  const clearTestNotificationsHandler = async () => {
+    try {
+      console.log('Clearing test notifications...');
+      const result = await clearTestNotifications();
+      console.log('Clear result:', result);
+      alert('Test notifications cleared!');
+    } catch (error) {
+      console.error('Error clearing test notifications:', error);
+      alert('Error clearing test notifications: ' + error.message);
     }
   };
 
@@ -50,6 +74,13 @@ const Navbar = () => {
           title='Test Notification'
         >
           Test
+        </button>
+        <button
+          onClick={clearTestNotificationsHandler}
+          className='px-3 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600'
+          title='Clear Test Notifications'
+        >
+          Clear
         </button>
         <NotificationPanel />
 

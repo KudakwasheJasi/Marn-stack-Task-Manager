@@ -170,14 +170,21 @@ router.post("/test-notification", protectRoute, async (req, res) => {
     const { userId } = req.user;
     console.log('Creating test notification for user:', userId);
     
+    // Clear old test notifications first
+    await Notice.deleteMany({
+      team: [userId],
+      "metadata.action": { $regex: /^test_/ }
+    });
+    
+    const timestamp = Date.now();
     const testNotification = await Notice.create({
       team: [userId],
-      text: "This is a test notification to verify the system is working",
+      text: `This is a test notification to verify the system is working (${timestamp})`,
       notiType: "alert",
       createdBy: userId,
-      notificationId: `test_${Date.now()}`,
+      notificationId: `test_${timestamp}`,
       metadata: {
-        action: "test",
+        action: `test_${timestamp}`, // Make action unique each time
         taskTitle: "Test Task",
         priority: "medium",
         stage: "todo"
@@ -188,6 +195,25 @@ router.post("/test-notification", protectRoute, async (req, res) => {
     res.json({ status: true, message: "Test notification created", notification: testNotification });
   } catch (error) {
     console.error('Error creating test notification:', error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+// Clear test notifications endpoint
+router.delete("/clear-test-notifications", protectRoute, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    console.log('Clearing test notifications for user:', userId);
+    
+    const result = await Notice.deleteMany({
+      team: [userId],
+      "metadata.action": { $regex: /^test_/ }
+    });
+    
+    console.log('Cleared test notifications:', result.deletedCount);
+    res.json({ status: true, message: `Cleared ${result.deletedCount} test notifications` });
+  } catch (error) {
+    console.error('Error clearing test notifications:', error);
     res.status(500).json({ status: false, message: error.message });
   }
 });
