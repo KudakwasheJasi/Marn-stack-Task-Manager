@@ -4,12 +4,11 @@ import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import Button from "../Button";
 import { toast } from 'sonner';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { createTask } from '../../services/api';
 
 const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
   const [loading, setLoading] = useState(false);
-  const audioRef = useRef(null);
 
   const {
     register,
@@ -59,11 +58,8 @@ const AddSubTask = ({ open, setOpen, id, refetchTasks }) => {
       // Show notification and play sound
       showNotification("Sub-task Created", "A new sub-task has been created!");
       
-      const audio = audioRef.current;
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(error => console.error('Error playing sound:', error));
-      }
+      const audio = new Audio('/alarm-sound.mp3');
+      audio.play().catch(error => console.error('Error playing sound:', error));
 
       if (refetchTasks) {
         await refetchTasks();

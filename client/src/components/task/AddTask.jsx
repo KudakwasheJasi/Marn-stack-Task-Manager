@@ -6,12 +6,9 @@ import Button from "../Button";
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { createTask } from '../../services/api';
-import { useRef } from 'react';
 
 const AddTask = ({ open, setOpen, refreshTasks }) => {
     const [loading, setLoading] = useState(false);
-    const audioRef = useRef(null);
-    
     const {
         register,
         handleSubmit,
@@ -58,11 +55,8 @@ const AddTask = ({ open, setOpen, refreshTasks }) => {
             toast.success('Task created successfully');
             
             // Play sound notification
-            const audio = audioRef.current;
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(error => console.error('Error playing sound:', error));
-            }
+            const audio = new Audio('/alarm-sound.mp3');
+            audio.play().catch(error => console.error('Error playing sound:', error));
             
             // Close modal and reset form first
             setOpen(false);

@@ -46,7 +46,6 @@ const ICONS = {
 const NotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const alarmSound = new Audio('./alarm-sound.mp3'); // Using relative path
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
@@ -68,12 +67,14 @@ const NotificationPanel = () => {
 
   const handleTaskCreated = () => {
     showNotification("Task Created", "A new task has been created!");
-    alarmSound.play();
+    const audio = new Audio('/alarm-sound.mp3');
+    audio.play().catch(error => console.error('Error playing sound:', error));
   };
 
   const handleTaskDeleted = () => {
     showNotification("Task Deleted", "A task has been deleted!");
-    alarmSound.play();
+    const audio = new Audio('/alarm-sound.mp3');
+    audio.play().catch(error => console.error('Error playing sound:', error));
   };
 
   const callsToAction = [
