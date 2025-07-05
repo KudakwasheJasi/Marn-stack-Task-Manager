@@ -83,7 +83,7 @@ const AddTask = ({ open, setOpen, refreshTasks }) => {
 
     return (
         <>
-          <audio ref={audioRef} src="/alarm-sound.mp3" preload="auto" />
+          <audio ref={audioRef} src="/public/alarm-sound.mp3" preload="auto" />
           <ModalWrapper open={open} setOpen={setOpen}>
             <form onSubmit={handleSubmit(handleOnSubmit)} className='space-y-6'>
                 <Dialog.Title

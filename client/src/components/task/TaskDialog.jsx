@@ -111,7 +111,7 @@ const TaskDialog = ({ task, refetchTasks }) => {
 
   return (
     <>
-      <audio ref={audioRef} src="/alarm-sound.mp3" preload="auto" />
+      <audio ref={audioRef} src="/public/alarm-sound.mp3" preload="auto" />
       <div className="relative">
         <Menu as='div' className='relative inline-block text-left'>
           <Menu.Button 
