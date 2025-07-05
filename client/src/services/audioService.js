@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import alarmSound from '../public/alarm-sound.mp3';
 
 const audioService = {
   audio: null,
   
   init() {
     if (!this.audio) {
-      this.audio = new Audio(alarmSound);
+      this.audio = new Audio('/alarm-sound.mp3');
       this.audio.preload = 'auto';
       this.audio.onloadeddata = () => {
         console.log('Audio file loaded successfully');
