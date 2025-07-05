@@ -14,6 +14,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 import { isAdminRoute, protectRoute } from "../middlewares/authMiddlewave.js";
 import {
   activateUserProfile,
@@ -30,10 +31,20 @@ import {
 
 const router = express.Router();
 
+// Ensure uploads directory exists
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Created uploads directory:', uploadsDir);
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -68,8 +79,46 @@ router.put("/read-noti", protectRoute, markNotificationRead);
 router.put("/change-password", protectRoute, changeUserPassword);
 
 // Profile image upload endpoint
-router.post("/upload-profile-image", protectRoute, upload.single('image'), async (req, res) => {
+router.post("/upload-profile-image", protectRoute, (req, res, next) => {
+  console.log("Upload endpoint hit - checking directory:", uploadsDir);
+  console.log("Directory exists:", fs.existsSync(uploadsDir));
+  console.log("Directory is writable:", fs.accessSync ? (() => {
+    try { fs.accessSync(uploadsDir, fs.constants.W_OK); return true; } catch { return false; }
+  })() : 'Cannot check');
+  
+  upload.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      console.error("Multer error:", err);
+      return res.status(400).json({
+        status: false,
+        message: err.code === 'LIMIT_FILE_SIZE' ? 'File too large (max 5MB)' : 'File upload error'
+      });
+    } else if (err) {
+      console.error("Upload error:", err);
+      return res.status(400).json({
+        status: false,
+        message: err.message || 'File upload error'
+      });
+    }
+    
+    // Continue to the main handler
+    next();
+  });
+}, async (req, res) => {
   try {
+    console.log("Upload request received:", {
+      hasFile: !!req.file,
+      fileInfo: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        filename: req.file.filename,
+        path: req.file.path
+      } : null,
+      user: req.user ? req.user._id : null,
+      headers: req.headers
+    });
+
     if (!req.file) {
       return res.status(400).json({
         status: false,
@@ -77,8 +126,24 @@ router.post("/upload-profile-image", protectRoute, upload.single('image'), async
       });
     }
 
+    // Verify file was actually saved
+    if (!fs.existsSync(req.file.path)) {
+      console.error("File was not saved to disk:", req.file.path);
+      return res.status(500).json({
+        status: false,
+        message: "Failed to save file to disk"
+      });
+    }
+
     // Create the image URL
     const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+    console.log("Image uploaded successfully:", {
+      filename: req.file.filename,
+      imageUrl: imageUrl,
+      filePath: req.file.path,
+      fileExists: fs.existsSync(req.file.path)
+    });
 
     res.json({
       status: true,
@@ -92,7 +157,8 @@ router.post("/upload-profile-image", protectRoute, upload.single('image'), async
     console.error("Profile image upload error:", error);
     res.status(500).json({
       status: false,
-      message: "Failed to upload profile image"
+      message: "Failed to upload profile image",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
