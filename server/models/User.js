@@ -58,7 +58,15 @@ const userSchema = new mongoose.Schema({
     bio: {
         type: String,
         default: null
-    }
+    },
+    notificationPreferences: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        taskAssignment: { type: Boolean, default: true },
+        comments: { type: Boolean, default: true },
+        deadlineReminders: { type: Boolean, default: true }
+    },
+    team: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 // Helper function to try multiple bcrypt versions

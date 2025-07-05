@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 21:53:12
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import React, { useState, useEffect } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";

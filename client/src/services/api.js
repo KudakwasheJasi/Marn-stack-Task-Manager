@@ -403,3 +403,63 @@ export const clearTestNotifications = async () => {
         throw error;
     }
 };
+
+export const getNotificationPreferences = async () => {
+    try {
+        const response = await API.get('/users/notification-preferences');
+        return response.data.preferences;
+    } catch (error) {
+        handleApiError('getNotificationPreferences', error);
+        throw error;
+    }
+};
+
+export const updateNotificationPreferences = async (prefs) => {
+    try {
+        const response = await API.put('/users/notification-preferences', prefs);
+        return response.data.preferences;
+    } catch (error) {
+        handleApiError('updateNotificationPreferences', error);
+        throw error;
+    }
+};
+
+export const getTeamMembers = async () => {
+    try {
+        const response = await API.get('/users/get-team');
+        return response.data;
+    } catch (error) {
+        handleApiError('getTeamMembers', error);
+        throw error;
+    }
+};
+
+export const deleteAccount = async () => {
+    try {
+        const response = await API.delete('/users/profile');
+        return response.data;
+    } catch (error) {
+        handleApiError('deleteAccount', error);
+        throw error;
+    }
+};
+
+export const addTeamMember = async (email) => {
+    try {
+        const response = await API.post('/users/team/add', { email });
+        return response.data.team;
+    } catch (error) {
+        handleApiError('addTeamMember', error);
+        throw error;
+    }
+};
+
+export const removeTeamMember = async (memberId) => {
+    try {
+        const response = await API.post('/users/team/remove', { memberId });
+        return response.data.team;
+    } catch (error) {
+        handleApiError('removeTeamMember', error);
+        throw error;
+    }
+};

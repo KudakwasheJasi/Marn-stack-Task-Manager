@@ -27,6 +27,10 @@ import {
   markNotificationRead,
   registerUser,
   updateUserProfile,
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  addTeamMember,
+  removeTeamMember,
 } from "../controllers/userController.js";
 import Notice from "../models/notification.js";
 
@@ -223,5 +227,11 @@ router
   .route("/:id")
   .put(protectRoute, isAdminRoute, activateUserProfile)
   .delete(protectRoute, isAdminRoute, deleteUserProfile);
+
+router.get("/notification-preferences", protectRoute, getNotificationPreferences);
+router.put("/notification-preferences", protectRoute, updateNotificationPreferences);
+
+router.post("/team/add", protectRoute, addTeamMember);
+router.post("/team/remove", protectRoute, removeTeamMember);
 
 export default router;

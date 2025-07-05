@@ -274,3 +274,76 @@ export const deleteUserProfile = async (req, res) => {
     return res.status(400).json({ status: false, message: error.message });
   }
 };
+
+export const getNotificationPreferences = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const user = await User.findById(userId).select('notificationPreferences');
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' });
+    }
+    res.json({ status: true, preferences: user.notificationPreferences });
+  } catch (error) {
+    console.error('Get notification preferences error:', error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const updateNotificationPreferences = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { email, push } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' });
+    }
+    if (email !== undefined) user.notificationPreferences.email = email;
+    if (push !== undefined) user.notificationPreferences.push = push;
+    await user.save();
+    res.json({ status: true, preferences: user.notificationPreferences });
+  } catch (error) {
+    console.error('Update notification preferences error:', error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const addTeamMember = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { email } = req.body;
+    const user = await User.findById(userId);
+    const member = await User.findOne({ email });
+    if (!user || !member) {
+      return res.status(404).json({ status: false, message: 'User or member not found' });
+    }
+    if (user.team.includes(member._id)) {
+      return res.status(400).json({ status: false, message: 'Member already in team' });
+    }
+    user.team.push(member._id);
+    await user.save();
+    res.json({ status: true, team: user.team });
+  } catch (error) {
+    console.error('Add team member error:', error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+export const removeTeamMember = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { memberId } = req.body;
+    if (userId === memberId) {
+      return res.status(400).json({ status: false, message: 'Cannot remove yourself from the team' });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'User not found' });
+    }
+    user.team = user.team.filter(id => id.toString() !== memberId);
+    await user.save();
+    res.json({ status: true, team: user.team });
+  } catch (error) {
+    console.error('Remove team member error:', error);
+    res.status(500).json({ status: false, message: error.message });
+  }
+};
