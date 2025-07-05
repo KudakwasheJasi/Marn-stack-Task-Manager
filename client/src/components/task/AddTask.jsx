@@ -6,11 +6,11 @@ import Button from "../Button";
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { createTask } from '../../services/api';
-import { useRef } from 'react';
+import { useAudio } from '../../services/audioService';
 
 const AddTask = ({ open, setOpen, refreshTasks }) => {
     const [loading, setLoading] = useState(false);
-    const audioRef = useRef(null);
+    const { play } = useAudio();
     
     const {
         register,
@@ -58,11 +58,7 @@ const AddTask = ({ open, setOpen, refreshTasks }) => {
             toast.success('Task created successfully');
             
             // Play sound notification
-            const audio = audioRef.current;
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().catch(error => console.error('Error playing sound:', error));
-            }
+            play();
             
             // Close modal and reset form first
             setOpen(false);
@@ -83,7 +79,7 @@ const AddTask = ({ open, setOpen, refreshTasks }) => {
 
     return (
         <>
-          <audio ref={audioRef} src="./alarm-sound.mp3" preload="auto" />
+    
           <ModalWrapper open={open} setOpen={setOpen}>
             <form onSubmit={handleSubmit(handleOnSubmit)} className='space-y-6'>
                 <Dialog.Title

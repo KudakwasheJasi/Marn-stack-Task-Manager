@@ -5,6 +5,7 @@ import { BiSolidMessageRounded } from "react-icons/bi";
 import { HiBellAlert } from "react-icons/hi2";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
+import { useAudio } from "../../services/audioService";
 
 const data = [
   {
@@ -46,7 +47,7 @@ const ICONS = {
 const NotificationPanel = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [alarmSound, setAlarmSound] = useState(null);
+  const { play } = useAudio();
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
@@ -81,25 +82,12 @@ const NotificationPanel = () => {
 
   const handleTaskCreated = () => {
     showNotification("Task Created", "A new task has been created!");
-    playSound();
+    play();
   };
 
   const handleTaskDeleted = () => {
     showNotification("Task Deleted", "A task has been deleted!");
-    playSound();
-  };
-
-  const playSound = () => {
-    if (alarmSound) {
-      // Pause any existing sound
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
-      
-      // Play new sound
-      alarmSound.play().catch(error => {
-        console.error('Error playing sound:', error);
-      });
-    }
+    play();
   };
 
   const callsToAction = [
