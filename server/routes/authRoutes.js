@@ -19,6 +19,18 @@ import { protectRoute as authenticateToken } from "../middlewares/authMiddlewave
 
 const router = express.Router();
 
+// Logout route
+router.post('/logout', (req, res) => {
+    // Clear the token cookie
+    res.clearCookie('token');
+    
+    // Send success response
+    res.json({
+        status: true,
+        message: 'Successfully logged out'
+    });
+});
+
 // Test route - useful for debugging
 router.get('/test', (_, res) => {
     res.json({ status: true, message: 'Auth routes are working!' });

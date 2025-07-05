@@ -16,7 +16,8 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
-  MdEdit, // <-- Use this as the edit/clipboard icon
+  MdEdit,
+  IoLogOutOutline
 } from "react-icons/md";
 import { FaNewspaper, FaUsers } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
@@ -268,8 +269,46 @@ const Dashboard = () => {
       </div>
     );
   };
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      
+      // Make API call to logout
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Navigate to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className='h-full py-4'>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-2xl font-bold'>Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className='flex items-center gap-2 px-4 py-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition-colors'
+          disabled={loading}
+        >
+          <IoLogOutOutline className='text-lg' />
+          {loading ? 'Logging out...' : 'Logout'}
+        </button>
+      </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-5'>
         {stats.map(({ icon, bg, label, total, status }, index) => (
           <Card key={index} icon={icon} bg={bg} label={label} count={total} status={status} refreshTasks={refreshTasks} />

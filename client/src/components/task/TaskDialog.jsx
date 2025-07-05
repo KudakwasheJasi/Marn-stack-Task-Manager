@@ -7,13 +7,11 @@ import { MdAdd, MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { Menu, Transition } from "@headlessui/react";
 import AddTask from "./AddTask";
-import AddSubTask from "./AddSubTask";
 import ConfirmationDialog from "../Dialogs";
 import { toast } from 'sonner';
 import { deleteTask, createTask, updateTask } from '../../services/api'; // Ensure deleteTask and createTask are imported
 
 const TaskDialog = ({ task, refetchTasks }) => {
-  const [open, setOpen] = useState(false); // State for adding sub-task
   const [openEdit, setOpenEdit] = useState(false); // State for editing task
   const [openDialog, setOpenDialog] = useState(false); // State for confirmation dialog
   const [loading, setLoading] = useState(false); // State for loading indicator
@@ -187,12 +185,10 @@ const TaskDialog = ({ task, refetchTasks }) => {
         refetchTasks={refetchTasks}
       />
 
-
-
       <ConfirmationDialog
         open={openDialog}
         setOpen={setOpenDialog}
-        onClick={deleteHandler} // Call deleteHandler on confirmation
+        onClick={deleteHandler}
         title="Delete Task"
         message="Are you sure you want to delete this task? This action cannot be undone."
         confirmLabel={loading ? "Deleting..." : "Delete"}

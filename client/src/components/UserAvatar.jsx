@@ -9,12 +9,33 @@ import { getInitials } from "../utils";
 const UserAvatar = () => {
   const [open, setOpen] = useState(false);
   const [openPassword, setOpenPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const logoutHandler = () => {
-    console.log("logout");
+  const logoutHandler = async () => {
+    try {
+      setLoading(true);
+      
+      // Make API call to logout
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include' // Send cookies
+      });
+
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Navigate to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,9 +90,10 @@ const UserAvatar = () => {
                     <button
                       onClick={logoutHandler}
                       className={`text-red-600 group flex w-full items-center rounded-md px-2 py-2 text-base`}
+                      disabled={loading}
                     >
                       <IoLogOutOutline className='mr-2' aria-hidden='true' />
-                      Logout
+                      {loading ? 'Logging out...' : 'Logout'}
                     </button>
                   )}
                 </Menu.Item>
