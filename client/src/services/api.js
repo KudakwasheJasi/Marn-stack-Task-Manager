@@ -13,8 +13,13 @@
  * - Date            : 04/07/2025
  * - Author          : kudakwashe Ellijah
  * - Modification    : Updated API configuration to use the correct URL with /api prefix
+ * - Version         : 1.0.3
+ * - Date            : 04/07/2025
+ * - Author          : kudakwashe Ellijah
+ * - Modification    : Enhanced API service with improved authentication handling and error management
 **/
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
@@ -25,22 +30,13 @@ const API = axios.create({
     }
 });
 
-// Request interceptor with token handling and logging
+// Request interceptor with token handling
 API.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        const sanitizedConfig = {
-            url: config.url,
-            method: config.method,
-            headers: { ...config.headers }
-        };
-        if (sanitizedConfig.headers.Authorization) {
-            sanitizedConfig.headers.Authorization = 'Bearer [REDACTED]';
-        }
-        console.log('API Request:', sanitizedConfig);
         return config;
     },
     (error) => {
@@ -49,28 +45,29 @@ API.interceptors.request.use(
     }
 );
 
-// Response interceptor with retry logic
+// Response interceptor with retry logic and auth handling
 API.interceptors.response.use(
     (response) => {
-        const sanitizedResponse = {
-            url: response.config.url,
-            status: response.status,
-            data: response.config.url.includes('auth') ? '[REDACTED]' : response.data
-        };
-        console.log('API Response:', sanitizedResponse);
         return response;
     },
     async (error) => {
         const originalRequest = error.config;
+        const navigate = useNavigate();
 
         if (!originalRequest) {
             return Promise.reject(error);
         }
 
-        originalRequest._retry = originalRequest._retry || 0;
+        // Handle 401 errors
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            navigate('/login', { replace: true });
+            return Promise.reject(error);
+        }
 
+        // Handle network errors with retry
         if (error.code === 'ERR_NETWORK' && originalRequest._retry < 3) {
-            originalRequest._retry += 1;
+            originalRequest._retry = (originalRequest._retry || 0) + 1;
             console.log(`Retrying request (${originalRequest._retry}/3)...`);
 
             const delay = Math.min(1000 * (2 ** originalRequest._retry), 10000);
@@ -85,11 +82,6 @@ API.interceptors.response.use(
             } catch (healthError) {
                 throw new Error('Unable to connect to server');
             }
-        }
-
-        if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            return Promise.reject(error);
         }
 
         return Promise.reject(error);

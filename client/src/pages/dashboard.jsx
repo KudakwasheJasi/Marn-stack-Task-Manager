@@ -11,7 +11,10 @@
     * - Modification    : 
 **/
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import AddTask from "../components/task/AddTask";
+import { API } from "../services/api";
 import moment from 'moment';
 import {
   MdAdminPanelSettings,
@@ -161,32 +164,24 @@ const UserTable = ({ users }) => {
   );
 };
 const Dashboard = () => {
-    const [tasks, setTasks] = useState([]);
-    const [summary, setSummary] = useState(null);
-    const [selectedStatus, setSelectedStatus] = useState('all');
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [showCreateTask, setShowCreateTask] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch dashboard data');
-        }
-        const data = await response.json();
-        setTasks(data.last10Task || []);
-        setSummary(data);
-        setLoading(false);
+        const response = await API.get('/dashboard');
+        setTasks(response.data.last10Tasks || []);
+        setSummary(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         toast.error('Failed to load dashboard data. Please try again.');
+      } finally {
         setLoading(false);
       }
     };
@@ -194,22 +189,26 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-    const handleLogout = async () => {
+  const refreshTasks = async () => {
     try {
       setLoading(true);
-      
-      // Make API call to logout
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      const response = await API.get('/tasks');
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Get tasks error:', error);
+      toast.error('Failed to load tasks. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // Clear user data from localStorage
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await API.post('/auth/logout');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
-      // Navigate to login page
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to logout. Please try again.');
