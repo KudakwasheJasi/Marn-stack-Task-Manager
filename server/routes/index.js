@@ -14,6 +14,6 @@ router.get('/test-routes', (req, res) => {
 router.use("/tasks", taskRoutes);  // Changed from /task to /tasks
 router.use("/users", userRoutes);  // Changed from /user to /users
 router.use("/auth", authRoutes);
-router.use("/dashboard", dashboardRoutes);
+router.use("/api/dashboard", dashboardRoutes);
 
 export default router;
