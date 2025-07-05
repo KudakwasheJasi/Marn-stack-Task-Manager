@@ -1,51 +1,7 @@
-import { useState, useEffect } from 'react';
-
-const audioService = {
-  audio: null,
-  
-  init() {
-    if (!this.audio) {
-      this.audio = new Audio('/alarm-sound.mp3');
-      this.audio.preload = 'auto';
-    }
-    return this.audio;
-  },
-
-  play() {
-    if (this.audio) {
-      try {
-        this.audio.pause();
-        this.audio.currentTime = 0;
-        this.audio.play().catch(error => {
-          console.error('Error playing sound:', error);
-        });
-      } catch (error) {
-        console.error('Error handling audio:', error);
-      }
-    }
-  },
-
-  cleanup() {
-    if (this.audio) {
-      this.audio.pause();
-      this.audio.currentTime = 0;
-      this.audio = null;
-    }
+// Simplified audio service - no longer needed since we're using direct audio elements in components
+export const useAudio = () => ({
+  play: () => {
+    const audio = new Audio('/alarm-sound.mp3');
+    audio.play().catch(error => console.error('Error playing sound:', error));
   }
-};
-
-export const useAudio = () => {
-  const [audio, setAudio] = useState(null);
-
-  useEffect(() => {
-    const initializedAudio = audioService.init();
-    setAudio(initializedAudio);
-    return () => audioService.cleanup();
-  }, []);
-
-  return {
-    play: audioService.play
-  };
-};
-
-export default audioService;
+});
