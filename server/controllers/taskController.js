@@ -5,14 +5,21 @@
     * @created          : 01/07/2025 - 16:00:23
     * 
     * MODIFICATION LOG
-    * - Version         : 1.0.0
-    * - Date            : 01/07/2025
+    * - Version         : 2.0.0
+    * - Date            : 05/07/2025
     * - Author          : kudakwashe Ellijah
-    * - Modification    : 
+    * - Modification    : Enhanced with comprehensive notification system
 **/
 import Notice from "../models/notification.js";
 import Task from "../models/task.js";
 import User from "../models/User.js";
+import { 
+  notifyTaskCreated, 
+  notifyTaskDeleted, 
+  notifyTaskUpdated, 
+  notifyTaskDuplicated,
+  notifySubtaskCreated 
+} from "../utils/notificationService.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -20,20 +27,9 @@ export const createTask = async (req, res) => {
 
     const { title, team, stage, date, priority, assets } = req.body;
 
-    let text = "New task has been assigned to you";
-    if (team?.length > 1) {
-      text = text + ` and ${team?.length - 1} others.`;
-    }
-
-    text =
-      text +
-      ` The task priority is set a ${priority} priority, so check and act accordingly. The task date is ${new Date(
-        date
-      ).toDateString()}. Thank you!!!`;
-
     const activity = {
       type: "assigned",
-      activity: text,
+      activity: "Task created",
       by: userId,
     };
 
@@ -47,11 +43,12 @@ export const createTask = async (req, res) => {
       activities: activity,
     });
 
-    await Notice.create({
-      team,
-      text,
-      task: task._id,
-    });
+    // Get user name for notification
+    const user = await User.findById(userId).select('name');
+    const userName = user ? user.name : 'Unknown User';
+
+    // Create notification using the new service
+    await notifyTaskCreated(task, userName);
 
     res
       .status(200)
@@ -65,6 +62,7 @@ export const createTask = async (req, res) => {
 export const duplicateTask = async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.user;
 
     const task = await Task.findById(id);
 
@@ -81,23 +79,12 @@ export const duplicateTask = async (req, res) => {
 
     await newTask.save();
 
-    //alert users of the task
-    let text = "New task has been assigned to you";
-    if (task.team.length > 1) {
-      text = text + ` and ${task.team.length - 1} others.`;
-    }
+    // Get user name for notification
+    const user = await User.findById(userId).select('name');
+    const userName = user ? user.name : 'Unknown User';
 
-    text =
-      text +
-      ` The task priority is set a ${
-        task.priority
-      } priority, so check and act accordingly. The task date is ${task.date.toDateString()}. Thank you!!!`;
-
-    await Notice.create({
-      team: task.team,
-      text,
-      task: newTask._id,
-    });
+    // Create notification using the new service
+    await notifyTaskDuplicated(task, newTask, userName);
 
     res
       .status(200)
@@ -293,6 +280,7 @@ export const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, priority, stage, team, assets } = req.body;
+    const { userId } = req.user;
 
     const task = await Task.findById(id);
     if (!task) {
@@ -301,6 +289,14 @@ export const updateTask = async (req, res) => {
         message: "Task not found",
       });
     }
+
+    // Track changes for notification
+    const changes = {};
+    if (title && title !== task.title) changes.title = title;
+    if (description && description !== task.description) changes.description = description;
+    if (priority && priority !== task.priority) changes.priority = priority;
+    if (stage && stage !== task.stage) changes.stage = stage;
+    if (team && JSON.stringify(team) !== JSON.stringify(task.team)) changes.team = 'updated';
 
     // Update task fields
     task.title = title || task.title;
@@ -315,11 +311,18 @@ export const updateTask = async (req, res) => {
     task.activities.push({
       type: "updated",
       activity: "Task updated",
-      by: req.user.userId,
+      by: userId,
       date: new Date(),
     });
 
     await task.save();
+
+    // Create notification if there were changes
+    if (Object.keys(changes).length > 0) {
+      const user = await User.findById(userId).select('name');
+      const userName = user ? user.name : 'Unknown User';
+      await notifyTaskUpdated(task, userName, changes);
+    }
 
     res.json({
       status: true,

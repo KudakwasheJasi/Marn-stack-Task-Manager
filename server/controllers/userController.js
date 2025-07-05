@@ -14,6 +14,7 @@ import { response } from "express";
 import User from "../models/User.js";
 import { createJWT } from "../utils/index.js";
 import Notice from "../models/notification.js";
+import { getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../utils/notificationService.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -123,12 +124,9 @@ export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notice = await Notice.find({
-      team: userId,
-      isRead: { $nin: [userId] },
-    }).populate("task", "title");
+    const notifications = await getUserNotifications(userId, 20);
 
-    res.status(201).json(notice);
+    res.status(201).json(notifications);
   } catch (error) {
     console.log(error);
     return res.status(400).json({ status: false, message: error.message });
@@ -183,21 +181,12 @@ export const updateUserProfile = async (req, res) => {
 export const markNotificationRead = async (req, res) => {
   try {
     const { userId } = req.user;
-
     const { isReadType, id } = req.query;
 
     if (isReadType === "all") {
-      await Notice.updateMany(
-        { team: userId, isRead: { $nin: [userId] } },
-        { $push: { isRead: userId } },
-        { new: true }
-      );
+      await markAllNotificationsAsRead(userId);
     } else {
-      await Notice.findOneAndUpdate(
-        { _id: id, isRead: { $nin: [userId] } },
-        { $push: { isRead: userId } },
-        { new: true }
-      );
+      await markNotificationAsRead(id, userId);
     }
 
     res.status(201).json({ status: true, message: "Done" });

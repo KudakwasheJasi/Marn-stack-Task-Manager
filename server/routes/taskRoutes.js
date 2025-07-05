@@ -13,6 +13,8 @@
 import express from "express";
 import { protectRoute } from "../middlewares/authMiddlewave.js";
 import Task from "../models/task.js";
+import User from "../models/User.js";
+import { notifyTaskDeleted } from "../utils/notificationService.js";
 
 const router = express.Router();
 
@@ -172,12 +174,40 @@ router.post("/create", protectRoute, async (req, res) => {
 // DELETE route for deleting a task by ID
 router.delete("/:id", protectRoute, async (req, res) => {
     const taskId = req.params.id;
+    const { userId } = req.user;
+    
     try {
-        const result = await Task.findByIdAndDelete(taskId);
-        if (!result) {
-            return res.status(404).json({ message: 'Task not found' });
+        // Get the task before deleting it for notification
+        const task = await Task.findById(taskId).populate("team", "name email");
+        
+        if (!task) {
+            return res.status(404).json({ 
+                status: false,
+                message: 'Task not found' 
+            });
         }
-        res.status(200).json({ message: 'Task deleted successfully' });
+
+        // Get user name for notification
+        const user = await User.findById(userId).select('name');
+        const userName = user ? user.name : 'Unknown User';
+
+        // Delete the task
+        const result = await Task.findByIdAndDelete(taskId);
+        
+        if (!result) {
+            return res.status(404).json({ 
+                status: false,
+                message: 'Task not found' 
+            });
+        }
+
+        // Create notification for task deletion
+        await notifyTaskDeleted(task, userName);
+
+        res.status(200).json({ 
+            status: true,
+            message: 'Task deleted successfully' 
+        });
     } catch (error) {
         console.error("Delete task error:", error);
         res.status(500).json({

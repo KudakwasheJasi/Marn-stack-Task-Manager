@@ -359,3 +359,25 @@ export const updateUser = async (userId, userData) => {
         throw error;
     }
 };
+
+// Notification-related functions
+export const getNotifications = async () => {
+    try {
+        const response = await API.get('/users/notifications');
+        return response.data;
+    } catch (error) {
+        handleApiError('getNotifications', error);
+        throw error;
+    }
+};
+
+export const markNotificationRead = async (type, id) => {
+    try {
+        const params = type === 'all' ? { isReadType: 'all' } : { isReadType: 'single', id };
+        const response = await API.put('/users/read-noti', null, { params });
+        return response.data;
+    } catch (error) {
+        handleApiError('markNotificationRead', error);
+        throw error;
+    }
+};
