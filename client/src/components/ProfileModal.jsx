@@ -30,10 +30,9 @@ import { useAudio } from '../services/audioService';
 import { updateUser, uploadProfileImage } from '../services/api';
 import { updateUser as updateUserAction } from '../redux/slices/authSlice';
 
-const audio = useAudio();
-const dispatch = useDispatch();
-
 const ProfileModal = ({ open, onClose, user }) => {
+  const audio = useAudio();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
