@@ -33,6 +33,7 @@ import {
   removeTeamMember,
 } from "../controllers/userController.js";
 import Notice from "../models/notification.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
@@ -222,16 +223,28 @@ router.delete("/clear-test-notifications", protectRoute, async (req, res) => {
   }
 });
 
-// //   FOR ADMIN ONLY - ADMIN ROUTES
-router
-  .route("/:id")
-  .put(protectRoute, isAdminRoute, activateUserProfile)
-  .delete(protectRoute, isAdminRoute, deleteUserProfile);
+// Add this route before the /:id route
+router.delete("/profile", protectRoute, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    await User.findByIdAndDelete(userId);
+    res.status(200).json({ status: true, message: "User deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ status: false, message: error.message });
+  }
+});
 
+// Specific routes should come before the generic :id route
 router.get("/notification-preferences", protectRoute, getNotificationPreferences);
 router.put("/notification-preferences", protectRoute, updateNotificationPreferences);
 
 router.post("/team/add", protectRoute, addTeamMember);
 router.post("/team/remove", protectRoute, removeTeamMember);
+
+// Place the generic :id route LAST
+router
+  .route("/:id")
+  .put(protectRoute, isAdminRoute, activateUserProfile)
+  .delete(protectRoute, isAdminRoute, deleteUserProfile);
 
 export default router;

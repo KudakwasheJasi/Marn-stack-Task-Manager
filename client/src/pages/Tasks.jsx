@@ -178,10 +178,10 @@ const Tasks = () => {
   if (error) {
     return (
       <div className="w-full py-10 text-center">
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Connection Error</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <div className="text-sm text-gray-500 mb-4">
+        <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold text-red-600 dark:text-red-400 mb-4">Connection Error</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Please verify:
             <ul className="list-disc text-left pl-5 mt-2">
               <li>The server is running on port 8000</li>
@@ -205,7 +205,7 @@ const Tasks = () => {
               'Retry Connection'
             )}
           </button>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Attempt {retryCount}/{MAX_RETRIES}
           </p>
         </div>
@@ -251,7 +251,7 @@ const Tasks = () => {
       </div>
 
       {filteredTasks.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">
+        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
           No tasks found. Create a new task to get started!
         </div>
       ) : (

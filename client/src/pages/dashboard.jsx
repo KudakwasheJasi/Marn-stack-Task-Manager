@@ -38,8 +38,8 @@ const TaskTable = ({ tasks }) => {
   };
 
   const TableHeader = () => (
-    <thead className='border-b border-gray-300 '>
-      <tr className='text-black text-left'>
+    <thead className='border-b border-gray-300 dark:border-gray-600'>
+      <tr className='text-black dark:text-white text-left'>
         <th className='py-2'>Task Title</th>
         <th className='py-2'>Priority</th>
         <th className='py-2'>Team</th>
@@ -49,14 +49,14 @@ const TaskTable = ({ tasks }) => {
   );
 
   const TableRow = ({ task }) => (
-    <tr className='border-b border-gray-300 text-gray-600 hover:bg-gray-300/10'>
+    <tr className='border-b border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300/10 dark:hover:bg-gray-600/10'>
       <td className='py-2'>
         <div className='flex items-center gap-2'>
           <div
             className={clsx("w-4 h-4 rounded-full", TASK_TYPE[task.stage])}
           />
 
-          <p className='text-base text-black'>{task.title}</p>
+          <p className='text-base text-black dark:text-white'>{task.title}</p>
         </div>
       </td>
 
@@ -85,7 +85,7 @@ const TaskTable = ({ tasks }) => {
         </div>
       </td>
       <td className='py-2 hidden md:block'>
-        <span className='text-base text-gray-600'>
+        <span className='text-base text-gray-600 dark:text-gray-400'>
           {moment(task?.date).fromNow()}
         </span>
       </td>
@@ -93,7 +93,7 @@ const TaskTable = ({ tasks }) => {
   );
   return (
     <>
-      <div className='w-full md:w-2/3 bg-white px-2 md:px-4 pt-4 pb-4 shadow-md rounded'>
+      <div className='w-full md:w-2/3 bg-white dark:bg-gray-800 px-2 md:px-4 pt-4 pb-4 shadow-md rounded'>
         <table className='w-full'>
           <TableHeader />
           <tbody>
@@ -109,8 +109,8 @@ const TaskTable = ({ tasks }) => {
 
 const UserTable = ({ users }) => {
   const TableHeader = () => (
-    <thead className='border-b border-gray-300 '>
-      <tr className='text-black  text-left'>
+    <thead className='border-b border-gray-300 dark:border-gray-600'>
+      <tr className='text-black dark:text-white text-left'>
         <th className='py-2'>Full Name</th>
         <th className='py-2'>Status</th>
         <th className='py-2'>Created At</th>
@@ -119,7 +119,7 @@ const UserTable = ({ users }) => {
   );
 
   const TableRow = ({ user }) => (
-    <tr className='border-b border-gray-200  text-gray-600 hover:bg-gray-400/10'>
+    <tr className='border-b border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-400/10 dark:hover:bg-gray-600/10'>
       <td className='py-2'>
         <div className='flex items-center gap-3'>
           <div className='w-9 h-9 rounded-full text-white flex items-center justify-center text-sm bg-violet-700'>
@@ -127,8 +127,8 @@ const UserTable = ({ users }) => {
           </div>
 
           <div>
-            <p> {user.name}</p>
-            <span className='text-xs text-black'>{user?.role}</span>
+            <p className='dark:text-white'> {user.name}</p>
+            <span className='text-xs text-black dark:text-gray-400'>{user?.role}</span>
           </div>
         </div>
       </td>
@@ -137,18 +137,18 @@ const UserTable = ({ users }) => {
         <p
           className={clsx(
             "w-fit px-3 py-1 rounded-full text-sm",
-            user?.isActive ? "bg-blue-200" : "bg-yellow-100"
+            user?.isActive ? "bg-blue-200 dark:bg-blue-800 dark:text-blue-200" : "bg-yellow-100 dark:bg-yellow-800 dark:text-yellow-200"
           )}
         >
           {user?.isActive ? "Active" : "Disabled"}
         </p>
       </td>
-      <td className='py-2 text-sm'>{moment(user?.createdAt).fromNow()}</td>
+      <td className='py-2 text-sm dark:text-gray-400'>{moment(user?.createdAt).fromNow()}</td>
     </tr>
   );
 
   return (
-    <div className='w-full md:w-1/3 bg-white h-fit px-2 md:px-6 py-4 shadow-md rounded'>
+    <div className='w-full md:w-1/3 bg-white dark:bg-gray-800 h-fit px-2 md:px-6 py-4 shadow-md rounded'>
       <table className='w-full mb-5'>
         <TableHeader />
         <tbody>
@@ -249,27 +249,27 @@ const Dashboard = () => {
     };
 
     return (
-      <div className='w-full h-32 bg-white p-5 shadow-md rounded-md flex items-center justify-between'>
+      <div className='w-full h-32 bg-white dark:bg-gray-800 p-5 shadow-md rounded-md flex items-center justify-between'>
         <div className='h-full flex flex-1 flex-col justify-between'>
-          <p className='text-base text-gray-600'>{label}</p>
-          <span className='text-2xl font-semibold'>{count}</span>
-          <span className='text-sm text-gray-400'>{"110 last month"}</span>
+          <p className='text-base text-gray-600 dark:text-gray-400'>{label}</p>
+          <span className='text-2xl font-semibold dark:text-white'>{count}</span>
+          <span className='text-sm text-gray-400 dark:text-gray-500'>{"110 last month"}</span>
         </div>
 
         <div className='flex items-center gap-2'>
           <button
             onClick={() => handleStatusClick(status)}
             className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-              selectedStatus === status ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              selectedStatus === status ? 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
-            <MdKeyboardArrowUp className='text-gray-600' />
+            <MdKeyboardArrowUp className='text-gray-600 dark:text-gray-400' />
           </button>
           <button
             onClick={() => handleRefresh()}
-            className='w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors'
+            className='w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors'
           >
-            <MdKeyboardDoubleArrowUp className='text-blue-600' />
+            <MdKeyboardDoubleArrowUp className='text-blue-600 dark:text-blue-400' />
           </button>
           <div
             className={clsx(
@@ -283,8 +283,8 @@ const Dashboard = () => {
 
         {showCreateTask && (
           <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
-            <div className='bg-white rounded-lg p-6 max-w-md w-full'>
-              <h3 className='text-lg font-bold mb-4'>Create New Task</h3>
+            <div className='bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full'>
+              <h3 className='text-lg font-bold mb-4 dark:text-white'>Create New Task</h3>
               <AddTask
                 open={showCreateTask}
                 setOpen={setShowCreateTask}
@@ -299,7 +299,7 @@ const Dashboard = () => {
   return (
     <div className='h-full py-4'>
       <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-2xl font-bold'>Dashboard</h1>
+        <h1 className='text-2xl font-bold dark:text-white'>Dashboard</h1>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-5'>
         {stats.map(({ icon, bg, label, total, status }, index) => (
@@ -307,8 +307,8 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className='w-full bg-white my-16 p-4 rounded shadow-sm'>
-        <h4 className='text-xl text-gray-600 font-semibold'>
+      <div className='w-full bg-white dark:bg-gray-800 my-16 p-4 rounded shadow-sm'>
+        <h4 className='text-xl text-gray-600 dark:text-gray-400 font-semibold'>
           Chart by Priority
         </h4>
         <Chart />
@@ -319,8 +319,8 @@ const Dashboard = () => {
         {tasks.length > 0 ? (
           <TaskTable tasks={tasks} />
         ) : (
-          <div className='w-full md:w-2/3 bg-white px-2 md:px-4 pt-4 pb-4 shadow-md rounded flex items-center justify-center'>
-            <p className='text-gray-500'>No tasks available</p>
+          <div className='w-full md:w-2/3 bg-white dark:bg-gray-800 px-2 md:px-4 pt-4 pb-4 shadow-md rounded flex items-center justify-center'>
+            <p className='text-gray-500 dark:text-gray-400'>No tasks available</p>
           </div>
         )}
 
@@ -328,8 +328,8 @@ const Dashboard = () => {
         {summary?.users?.length > 0 ? (
           <UserTable users={summary.users} />
         ) : (
-          <div className='w-full md:w-1/3 bg-white px-2 md:px-6 py-4 shadow-md rounded flex items-center justify-center'>
-            <p className='text-gray-500'>No users available</p>
+          <div className='w-full md:w-1/3 bg-white dark:bg-gray-800 px-2 md:px-6 py-4 shadow-md rounded flex items-center justify-center'>
+            <p className='text-gray-500 dark:text-gray-400'>No users available</p>
           </div>
         )}
       </div>

@@ -63,7 +63,7 @@ function Layout() {
   };
 
   return (
-    <div className='w-full h-screen flex flex-col md:flex-row'>
+    <div className='w-full h-screen flex flex-col md:flex-row bg-gray-100 dark:bg-gray-900'>
       <MobileSidebar />
       <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarToggle} />
       <div className='flex-1 overflow-y-auto'>
@@ -78,7 +78,7 @@ function Layout() {
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={

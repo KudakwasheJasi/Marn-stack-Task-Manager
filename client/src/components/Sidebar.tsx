@@ -172,7 +172,7 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
         href={el.link === 'logout' ? '#' : `/${el.link}`}
         onClick={handleNav}
         className={clsx(
-          "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d] transition-colors duration-150",
+          "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 dark:text-gray-200 text-base hover:bg-[#2564ed2d] dark:hover:bg-blue-600/20 transition-colors duration-150",
           isActive ? "bg-blue-600 text-white font-semibold" : ""
         )}
       >
@@ -183,18 +183,18 @@ const NavLink: React.FC<NavLinkProps> = ({ el }) => {
   };
   return (
     <div className={clsx(
-      'fixed inset-y-0 left-0 z-50 w-full h-full bg-white shadow-lg transition-transform duration-300',
+      'fixed inset-y-0 left-0 z-50 w-full h-full bg-white dark:bg-gray-800 shadow-lg transition-transform duration-300 border-r border-gray-200 dark:border-gray-700',
       isOpen ? 'translate-x-0' : '-translate-x-full',
       'lg:translate-x-0 lg:static lg:w-64'
     )}>
-      <h1 className='flex gap-1 items-center'>
+      <h1 className='flex gap-1 items-center p-4'>
         <p className='bg-blue-600 p-2 rounded-full'>
           <MdOutlineAddTask className='text-white text-2xl font-black' />
         </p>
-        <span className='text-2xl font-bold text-black'>TaskMe</span>
+        <span className='text-2xl font-bold text-black dark:text-white'>TaskMe</span>
       </h1>
 
-      <div className='flex-1 flex flex-col gap-y-5 py-8'>
+      <div className='flex-1 flex flex-col gap-y-5 py-8 px-4'>
         {sidebarLinks.map((link) => (
           <NavLink el={link} key={link.label} />
         ))}
