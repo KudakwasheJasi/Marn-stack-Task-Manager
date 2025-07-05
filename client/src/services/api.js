@@ -381,3 +381,14 @@ export const markNotificationRead = async (type, id) => {
         throw error;
     }
 };
+
+// Test function to create a test notification
+export const createTestNotification = async () => {
+    try {
+        const response = await API.post('/users/test-notification');
+        return response.data;
+    } catch (error) {
+        handleApiError('createTestNotification', error);
+        throw error;
+    }
+};

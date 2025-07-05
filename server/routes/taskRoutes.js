@@ -138,6 +138,8 @@ router.post("/create", protectRoute, async (req, res) => {
         };
 
         console.log('Creating task with:', taskData);
+        console.log('Team members:', taskData.team);
+        console.log('Current user ID:', req.user.userId);
 
         const task = new Task(taskData);
         await task.save();

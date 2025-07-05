@@ -123,8 +123,11 @@ export const getTeamList = async (req, res) => {
 export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
+    console.log('Getting notifications for user ID:', userId);
+    console.log('User object from request:', req.user);
 
     const notifications = await getUserNotifications(userId, 20);
+    console.log('Returning notifications to frontend:', notifications.length);
 
     res.status(201).json(notifications);
   } catch (error) {

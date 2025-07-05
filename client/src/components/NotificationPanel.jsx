@@ -19,7 +19,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import { FaTasks, FaTrash, FaCopy, FaEdit, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getNotifications, markNotificationRead } from "../services/api";
+import { getNotifications, markNotificationRead, createTestNotification } from "../services/api";
 
 const ICONS = {
   alert: (
@@ -60,6 +60,7 @@ const NotificationPanel = () => {
 
   // Fetch notifications when component mounts or when opened
   useEffect(() => {
+    console.log('NotificationPanel useEffect triggered:', { open, user: user?._id });
     if (open && user) {
       fetchNotifications();
     }
@@ -69,13 +70,18 @@ const NotificationPanel = () => {
     try {
       setLoading(true);
       console.log('Fetching notifications for user:', user?._id);
+      console.log('User object:', user);
       const response = await getNotifications();
-      console.log('Notifications response:', response);
+      console.log('Notifications API response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response length:', Array.isArray(response) ? response.length : 'Not an array');
+      
       // The backend sends notifications directly, not wrapped in data property
       setNotifications(response || []);
       console.log('Set notifications:', response?.length || 0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      console.error('Error details:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -106,6 +112,18 @@ const NotificationPanel = () => {
     // Navigate to task if it exists
     if (item.task) {
       window.location.href = `/task/${item.task._id}`;
+    }
+  };
+
+  const testNotification = async () => {
+    try {
+      console.log('Creating test notification...');
+      const result = await createTestNotification();
+      console.log('Test notification result:', result);
+      // Refresh notifications after creating test
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error creating test notification:', error);
     }
   };
 
@@ -200,6 +218,12 @@ const NotificationPanel = () => {
                         {item.name}
                       </button>
                     ))}
+                    <button
+                      onClick={testNotification}
+                      className='text-sm font-semibold text-blue-600 hover:text-blue-700'
+                    >
+                      Test Notification
+                    </button>
                   </div>
                 </div>
               ) : (

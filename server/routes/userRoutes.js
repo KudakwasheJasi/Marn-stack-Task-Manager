@@ -28,6 +28,7 @@ import {
   registerUser,
   updateUserProfile,
 } from "../controllers/userController.js";
+import Notice from "../models/notification.js";
 
 const router = express.Router();
 
@@ -160,6 +161,34 @@ router.post("/upload-profile-image", protectRoute, (req, res, next) => {
       message: "Failed to upload profile image",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  }
+});
+
+// Test endpoint to create a notification manually
+router.post("/test-notification", protectRoute, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    console.log('Creating test notification for user:', userId);
+    
+    const testNotification = await Notice.create({
+      team: [userId],
+      text: "This is a test notification to verify the system is working",
+      notiType: "alert",
+      createdBy: userId,
+      notificationId: `test_${Date.now()}`,
+      metadata: {
+        action: "test",
+        taskTitle: "Test Task",
+        priority: "medium",
+        stage: "todo"
+      }
+    });
+    
+    console.log('Test notification created:', testNotification._id);
+    res.json({ status: true, message: "Test notification created", notification: testNotification });
+  } catch (error) {
+    console.error('Error creating test notification:', error);
+    res.status(500).json({ status: false, message: error.message });
   }
 });
 
