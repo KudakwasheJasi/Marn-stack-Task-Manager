@@ -236,10 +236,40 @@ export const getUserNotifications = async (userId, limit = 20) => {
 // Mark notification as read
 export const markNotificationAsRead = async (notificationId, userId) => {
   try {
-    await Notice.findByIdAndUpdate(
+    console.log('Marking notification as read:', { notificationId, userId });
+    
+    // First check if the notification exists
+    const notification = await Notice.findById(notificationId);
+    if (!notification) {
+      console.error('Notification not found:', notificationId);
+      throw new Error('Notification not found');
+    }
+    
+    console.log('Found notification:', {
+      id: notification._id,
+      team: notification.team,
+      isRead: notification.isRead
+    });
+    
+    // Check if user is in the team (should receive this notification)
+    if (!notification.team.includes(userId)) {
+      console.error('User not in notification team:', { userId, team: notification.team });
+      throw new Error('User not authorized to mark this notification as read');
+    }
+    
+    const result = await Notice.findByIdAndUpdate(
       notificationId,
-      { $addToSet: { isRead: userId } }
+      { $addToSet: { isRead: userId } },
+      { new: true }
     );
+    
+    console.log('Notification marked as read successfully:', {
+      notificationId,
+      userId,
+      updatedIsRead: result.isRead
+    });
+    
+    return result;
   } catch (error) {
     console.error('Error marking notification as read:', error);
     throw error;

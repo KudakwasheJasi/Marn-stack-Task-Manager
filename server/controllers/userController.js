@@ -185,17 +185,26 @@ export const markNotificationRead = async (req, res) => {
   try {
     const { userId } = req.user;
     const { isReadType, id } = req.query;
+    
+    console.log('Marking notification as read:', { userId, isReadType, id });
 
     if (isReadType === "all") {
+      console.log('Marking all notifications as read for user:', userId);
       await markAllNotificationsAsRead(userId);
-    } else {
+    } else if (isReadType === "single" || id) {
+      console.log('Marking single notification as read:', { notificationId: id, userId });
+      if (!id) {
+        return res.status(400).json({ status: false, message: "Notification ID is required" });
+      }
       await markNotificationAsRead(id, userId);
+    } else {
+      return res.status(400).json({ status: false, message: "Invalid request. Either 'all' or 'single' with ID required" });
     }
 
     res.status(201).json({ status: true, message: "Done" });
   } catch (error) {
-    console.log(error);
-    return res.status(400).json({ status: false, message: error.message });
+    console.error('Error marking notification as read:', error);
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
