@@ -180,7 +180,11 @@ const Dashboard = () => {
         setSummary(response.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data. Please try again.');
+        if (error.needsAuth) {
+          navigate('/login', { replace: true });
+        } else {
+          toast.error('Failed to load dashboard data. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -196,7 +200,11 @@ const Dashboard = () => {
       setTasks(response.data);
     } catch (error) {
       console.error('Get tasks error:', error);
-      toast.error('Failed to load tasks. Please try again.');
+      if (error.needsAuth) {
+        navigate('/login', { replace: true });
+      } else {
+        toast.error('Failed to load tasks. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -211,7 +219,11 @@ const Dashboard = () => {
       navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      toast.error('Failed to logout. Please try again.');
+      if (error.needsAuth) {
+        navigate('/login', { replace: true });
+      } else {
+        toast.error('Failed to logout. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

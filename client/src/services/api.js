@@ -17,9 +17,12 @@
  * - Date            : 04/07/2025
  * - Author          : kudakwashe Ellijah
  * - Modification    : Enhanced API service with improved authentication handling and error management
+ * - Version         : 1.0.4
+ * - Date            : 04/07/2025
+ * - Author          : kudakwashe Ellijah
+ * - Modification    : Updated API service to remove useNavigate and improve error handling
 **/
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'https://marn-stack-task-manager.onrender.com/api',
@@ -45,24 +48,26 @@ API.interceptors.request.use(
     }
 );
 
-// Response interceptor with retry logic and auth handling
+// Response interceptor with retry logic
 API.interceptors.response.use(
     (response) => {
         return response;
     },
     async (error) => {
         const originalRequest = error.config;
-        const navigate = useNavigate();
 
         if (!originalRequest) {
             return Promise.reject(error);
         }
 
-        // Handle 401 errors
+        // Handle token cleanup on 401 errors
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
-            navigate('/login', { replace: true });
-            return Promise.reject(error);
+            localStorage.removeItem('user');
+            return Promise.reject({
+                ...error,
+                needsAuth: true
+            });
         }
 
         // Handle network errors with retry
