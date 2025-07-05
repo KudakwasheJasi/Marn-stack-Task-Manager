@@ -58,9 +58,7 @@ const NotificationPanel = () => {
     }
   }, []);
 
-  // Fetch notifications when component mounts or when opened
   useEffect(() => {
-    console.log('NotificationPanel useEffect triggered:', { open, user: user?._id });
     if (open && user) {
       fetchNotifications();
     }
@@ -69,30 +67,8 @@ const NotificationPanel = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      console.log('Fetching notifications for user:', user?._id);
-      console.log('User object:', user);
       const response = await getNotifications();
-      console.log('Notifications API response:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response length:', Array.isArray(response) ? response.length : 'Not an array');
-      
-      // Debug: Log the structure of each notification
-      if (Array.isArray(response) && response.length > 0) {
-        console.log('First notification structure:', {
-          id: response[0]._id,
-          text: response[0].text,
-          notiType: response[0].notiType,
-          isRead: response[0].isRead,
-          isReadType: typeof response[0].isRead,
-          isReadLength: Array.isArray(response[0].isRead) ? response[0].isRead.length : 'Not array',
-          team: response[0].team,
-          createdBy: response[0].createdBy
-        });
-      }
-      
-      // The backend sends notifications directly, not wrapped in data property
       setNotifications(response || []);
-      console.log('Set notifications:', response?.length || 0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
       console.error('Error details:', error.response?.data);
@@ -142,102 +118,99 @@ const NotificationPanel = () => {
   ];
 
   return (
-    <>
-      <Popover className='relative'>
-        <Popover.Button className='inline-flex items-center outline-none'>
-          <div className='w-8 h-8 flex items-center justify-center text-gray-800 relative'>
-            <IoIosNotificationsOutline className='text-2xl' />
-            {notifications?.length > 0 && (
-              <span className='absolute text-center top-0 right-1 text-sm text-white font-semibold w-4 h-4 rounded-full bg-red-600'>
-                {notifications?.length}
-              </span>
-            )}
-          </div>
-        </Popover.Button>
-
-        <Transition
-          as={Fragment}
-          enter='transition ease-out duration-200'
-          enterFrom='opacity-0 translate-y-1'
-          enterTo='opacity-100 translate-y-0'
-          leave='transition ease-in duration-150'
-          leaveFrom='opacity-100 translate-y-0'
-          leaveTo='opacity-0 translate-y-1'
-        >
-          <Popover.Panel className='absolute -right-16 md:-right-2 z-10 mt-5 flex w-screen max-w-max  px-4'>
-            {({ close }) =>
-              notifications?.length > 0 ? (
-                <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
-                  <div className='p-4'>
-                    {loading ? (
-                      <div className='flex items-center justify-center py-8'>
-                        <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin'></div>
-                        <span className='ml-2 text-gray-600'>Loading notifications...</span>
-                      </div>
-                    ) : (
-                      notifications?.slice(0, 5).map((item, index) => (
-                        <div
-                          key={item._id + index}
-                          className='group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50 cursor-pointer'
-                          onClick={() => viewHandler(item)}
-                        >
-                          <div className='mt-1 h-8 w-8 flex items-center justify-center rounded-lg bg-gray-200 group-hover:bg-white'>
-                            {ICONS[item.notiType] || ICONS.alert}
-                          </div>
-
-                          <div className='flex-1'>
-                            <div className='flex items-center gap-3 font-semibold text-gray-900 capitalize'>
-                              <p>{item.notiType?.replace('_', ' ')}</p>
-                              <span className='text-xs font-normal lowercase'>
-                                {moment(item.createdAt).fromNow()}
-                              </span>
-                            </div>
-                            <p className='line-clamp-2 mt-1 text-gray-600'>
-                              {item.text}
-                            </p>
-                            {item.createdBy && (
-                              <p className='text-xs text-gray-500 mt-1'>
-                                By: {item.createdBy.name}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    )}
-                    
-                    {notifications?.length > 5 && (
-                      <div className='text-center py-2 text-sm text-gray-500'>
-                        +{notifications.length - 5} more notifications
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className='bg-gray-50 px-4 py-3 flex justify-between'>
-                    {callsToAction.map((item) => (
-                      <button
-                        key={item.name}
-                        onClick={item.onClick}
-                        className='text-sm font-semibold text-gray-900 hover:text-indigo-600'
+    <Popover className='relative' onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
+      <Popover.Button className='inline-flex items-center outline-none'>
+        <div className='w-8 h-8 flex items-center justify-center text-gray-800 relative'>
+          <IoIosNotificationsOutline className='text-2xl' />
+          {notifications?.length > 0 && (
+            <span className='absolute text-center top-0 right-1 text-sm text-white font-semibold w-4 h-4 rounded-full bg-red-600'>
+              {notifications?.length}
+            </span>
+          )}
+        </div>
+      </Popover.Button>
+      <Transition
+        as={Fragment}
+        enter='transition ease-out duration-200'
+        enterFrom='opacity-0 translate-y-1'
+        enterTo='opacity-100 translate-y-0'
+        leave='transition ease-in duration-150'
+        leaveFrom='opacity-100 translate-y-0'
+        leaveTo='opacity-0 translate-y-1'
+      >
+        <Popover.Panel className='absolute -right-16 md:-right-2 z-10 mt-5 flex w-screen max-w-max  px-4'>
+          {({ close }) =>
+            notifications?.length > 0 ? (
+              <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
+                <div className='p-4'>
+                  {loading ? (
+                    <div className='flex items-center justify-center py-8'>
+                      <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin'></div>
+                      <span className='ml-2 text-gray-600'>Loading notifications...</span>
+                    </div>
+                  ) : (
+                    notifications?.slice(0, 5).map((item, index) => (
+                      <div
+                        key={item._id + index}
+                        className='group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50 cursor-pointer'
+                        onClick={() => viewHandler(item)}
                       >
-                        {item.name}
-                      </button>
-                    ))}
-                  </div>
+                        <div className='mt-1 h-8 w-8 flex items-center justify-center rounded-lg bg-gray-200 group-hover:bg-white'>
+                          {ICONS[item.notiType] || ICONS.alert}
+                        </div>
+
+                        <div className='flex-1'>
+                          <div className='flex items-center gap-3 font-semibold text-gray-900 capitalize'>
+                            <p>{item.notiType?.replace('_', ' ')}</p>
+                            <span className='text-xs font-normal lowercase'>
+                              {moment(item.createdAt).fromNow()}
+                            </span>
+                          </div>
+                          <p className='line-clamp-2 mt-1 text-gray-600'>
+                            {item.text}
+                          </p>
+                          {item.createdBy && (
+                            <p className='text-xs text-gray-500 mt-1'>
+                              By: {item.createdBy.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  
+                  {notifications?.length > 5 && (
+                    <div className='text-center py-2 text-sm text-gray-500'>
+                      +{notifications.length - 5} more notifications
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
-                  <div className='p-8 text-center'>
-                    <IoIosNotificationsOutline className='mx-auto h-12 w-12 text-gray-400' />
-                    <h3 className='mt-2 text-sm font-semibold text-gray-900'>No notifications</h3>
-                    <p className='mt-1 text-sm text-gray-500'>You're all caught up!</p>
-                  </div>
+                
+                <div className='bg-gray-50 px-4 py-3 flex justify-between'>
+                  {callsToAction.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={item.onClick}
+                      className='text-sm font-semibold text-gray-900 hover:text-indigo-600'
+                    >
+                      {item.name}
+                    </button>
+                  ))}
                 </div>
-              )
-            }
-          </Popover.Panel>
-        </Transition>
-      </Popover>
-    </>
+              </div>
+            ) : (
+              <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
+                <div className='p-8 text-center'>
+                  <IoIosNotificationsOutline className='mx-auto h-12 w-12 text-gray-400' />
+                  <h3 className='mt-2 text-sm font-semibold text-gray-900'>No notifications</h3>
+                  <p className='mt-1 text-sm text-gray-500'>You're all caught up!</p>
+                </div>
+              </div>
+            )
+          }
+        </Popover.Panel>
+      </Transition>
+    </Popover>
   );
 };
 
