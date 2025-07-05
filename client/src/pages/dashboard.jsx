@@ -11,21 +11,21 @@
     * - Modification    : 
 **/
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import {
   MdAdminPanelSettings,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
-  MdEdit,
-  IoLogOutOutline
+  MdEdit
 } from "react-icons/md";
+import { IoLogOutOutline } from "react-icons/io5";
 import { FaNewspaper, FaUsers } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
-import moment from "moment";
-import { summary } from "../assets/data";
+import { PRIORITYSTYLES, TASK_TYPE, BGS, getInitials } from "../utils";
 import clsx from "clsx";
 import { Chart } from "../components/Chart";
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 import UserInfo from "../components/UserInfo";
 import { toast } from 'sonner';
 import AddTask from '../components/task/AddTask';
@@ -161,20 +161,62 @@ const UserTable = ({ users }) => {
   );
 };
 const Dashboard = () => {
-  const [tasks, setTasks] = useState(summary.last10Task);
+    const [tasks, setTasks] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const refreshTasks = () => {
-    setTasks(summary.last10Task);
-    toast.success('Tasks refreshed');
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/dashboard');
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+        const data = await response.json();
+        setTasks(data.last10Task || []);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+    const handleLogout = async () => {
+    try {
+      setLoading(true);
+      
+      // Make API call to logout
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Navigate to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStatusClick = (status) => {
     setSelectedStatus(status);
     if (status === 'all') {
-      setTasks(summary.last10Task);
+      setTasks(tasks);
     } else {
-      setTasks(summary.last10Task.filter(task => task.stage === status));
+      setTasks(tasks.filter(task => task.stage === status));
     }
   };
 
@@ -189,31 +231,31 @@ const Dashboard = () => {
     },
     {
       _id: "2",
-      label: "COMPLTED TASK",
-      total: summary?.tasks?.completed || 0,
+      label: "COMPLETED TASK",
+      total: tasks?.filter(task => task.stage === 'completed').length || 0,
       icon: <MdAdminPanelSettings />,
       bg: "bg-[#0f766e]",
       status: "completed"
     },
     {
       _id: "3",
-      label: "TASK IN PROGRESS ",
-      total: summary?.tasks?.['in progress'] || 0,
-      icon: <MdEdit />, // <-- fixed icon here
+      label: "TASK IN PROGRESS",
+      total: tasks?.filter(task => task.stage === 'in progress').length || 0,
+      icon: <MdEdit />,
       bg: "bg-[#f59e0b]",
       status: "in progress"
     },
     {
       _id: "4",
       label: "TODOS",
-      total: summary?.tasks?.todo || 0,
+      total: tasks?.filter(task => task.stage === 'todo').length || 0,
       icon: <FaArrowsToDot />,
       bg: "bg-[#be185d]",
       status: "todo"
     },
   ];
 
-  const Card = ({ label, count, bg, icon, status, refreshTasks }) => {
+  const Card = ({ label, count, bg, icon, status }) => {
     const [showCreateTask, setShowCreateTask] = useState(false);
 
     const handleRefresh = () => {
@@ -239,7 +281,7 @@ const Dashboard = () => {
             <MdKeyboardArrowUp className='text-gray-600' />
           </button>
           <button
-            onClick={() => setShowCreateTask(true)}
+            onClick={() => handleRefresh()}
             className='w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors'
           >
             <MdKeyboardDoubleArrowUp className='text-blue-600' />
@@ -269,33 +311,6 @@ const Dashboard = () => {
       </div>
     );
   };
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      setLoading(true);
-      
-      // Make API call to logout
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      // Clear user data from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Navigate to login page
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to logout. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className='h-full py-4'>
       <div className='flex justify-between items-center mb-8'>
@@ -311,7 +326,7 @@ const Dashboard = () => {
       </div>
       <div className='grid grid-cols-1 md:grid-cols-4 gap-5'>
         {stats.map(({ icon, bg, label, total, status }, index) => (
-          <Card key={index} icon={icon} bg={bg} label={label} count={total} status={status} refreshTasks={refreshTasks} />
+          <Card key={index} icon={icon} bg={bg} label={label} count={total} status={status} />
         ))}
       </div>
 
@@ -324,12 +339,22 @@ const Dashboard = () => {
 
       <div className='w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8'>
         {/* /left */}
-
-        <TaskTable tasks={summary.last10Task} />
+        {tasks.length > 0 ? (
+          <TaskTable tasks={tasks} />
+        ) : (
+          <div className='w-full md:w-2/3 bg-white px-2 md:px-4 pt-4 pb-4 shadow-md rounded flex items-center justify-center'>
+            <p className='text-gray-500'>No tasks available</p>
+          </div>
+        )}
 
         {/* /right */}
-
-        <UserTable users={summary.users} />
+        {summary?.users?.length > 0 ? (
+          <UserTable users={summary.users} />
+        ) : (
+          <div className='w-full md:w-1/3 bg-white px-2 md:px-6 py-4 shadow-md rounded flex items-center justify-center'>
+            <p className='text-gray-500'>No users available</p>
+          </div>
+        )}
       </div>
     </div>
   );
