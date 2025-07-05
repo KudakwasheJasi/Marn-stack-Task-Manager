@@ -76,6 +76,20 @@ const NotificationPanel = () => {
       console.log('Response type:', typeof response);
       console.log('Response length:', Array.isArray(response) ? response.length : 'Not an array');
       
+      // Debug: Log the structure of each notification
+      if (Array.isArray(response) && response.length > 0) {
+        console.log('First notification structure:', {
+          id: response[0]._id,
+          text: response[0].text,
+          notiType: response[0].notiType,
+          isRead: response[0].isRead,
+          isReadType: typeof response[0].isRead,
+          isReadLength: Array.isArray(response[0].isRead) ? response[0].isRead.length : 'Not array',
+          team: response[0].team,
+          createdBy: response[0].createdBy
+        });
+      }
+      
       // The backend sends notifications directly, not wrapped in data property
       setNotifications(response || []);
       console.log('Set notifications:', response?.length || 0);
@@ -105,7 +119,9 @@ const NotificationPanel = () => {
 
   const viewHandler = (item) => {
     // Mark notification as read when viewed
-    if (!item.isRead?.includes(user?._id)) {
+    // Convert user ID to string for proper comparison with ObjectIds
+    const userIdString = user?._id?.toString();
+    if (!item.isRead?.some(readId => readId.toString() === userIdString)) {
       readHandler('single', item._id);
     }
     

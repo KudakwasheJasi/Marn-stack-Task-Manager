@@ -209,7 +209,7 @@ export const getUserNotifications = async (userId, limit = 20) => {
     console.log('Fetching notifications for user:', userId);
     
     const notifications = await Notice.find({
-      team: userId,
+      team: { $in: [userId] },
       isRead: { $nin: [userId] }
     })
     .populate("task", "title")
@@ -279,10 +279,24 @@ export const markNotificationAsRead = async (notificationId, userId) => {
 // Mark all notifications as read for a user
 export const markAllNotificationsAsRead = async (userId) => {
   try {
-    await Notice.updateMany(
-      { team: userId, isRead: { $nin: [userId] } },
+    console.log('Marking all notifications as read for user:', userId);
+    
+    // Find notifications where user is in the team array and hasn't read them yet
+    const result = await Notice.updateMany(
+      { 
+        team: { $in: [userId] }, 
+        isRead: { $nin: [userId] } 
+      },
       { $addToSet: { isRead: userId } }
     );
+    
+    console.log('Marked all notifications as read:', {
+      userId,
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount
+    });
+    
+    return result;
   } catch (error) {
     console.error('Error marking all notifications as read:', error);
     throw error;
