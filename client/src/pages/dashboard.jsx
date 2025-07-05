@@ -171,7 +171,9 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard`, {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
         }
