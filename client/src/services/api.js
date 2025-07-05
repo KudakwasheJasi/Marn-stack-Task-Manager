@@ -16,6 +16,7 @@
 **/
 import axios from 'axios';
 import { useAudio } from './audioService';
+import { toast } from 'sonner';
 
 const audio = useAudio();
 
@@ -76,6 +77,9 @@ API.interceptors.response.use(
         if (error.response?.status === 401) {
             console.log('Authentication failed, clearing user session');
             
+            // Show a toast before redirecting
+            toast.error('Session expired or unauthorized. Please log in again.');
+
             // Clear all authentication data
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -85,10 +89,12 @@ API.interceptors.response.use(
             API.defaults.headers.common = {};
             API.defaults.headers.Authorization = '';
             
-            // Redirect to login page if we're not already there
-            if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-                window.location.href = '/login';
-            }
+            // Delay redirect to allow user to see the error
+            setTimeout(() => {
+                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                    window.location.href = '/login';
+                }
+            }, 1500);
             
             return Promise.reject(new Error('Authentication failed. Please login again.'));
         }
