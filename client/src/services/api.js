@@ -29,7 +29,8 @@ const API = axios.create({
     timeout: 30000, // Increased timeout to 30 seconds
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
     }
 });
 
