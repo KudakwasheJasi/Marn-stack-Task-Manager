@@ -68,10 +68,12 @@ const NotificationPanel = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
+      console.log('Fetching notifications for user:', user?._id);
       const response = await getNotifications();
-      if (response.status) {
-        setNotifications(response.data || []);
-      }
+      console.log('Notifications response:', response);
+      // The backend sends notifications directly, not wrapped in data property
+      setNotifications(response || []);
+      console.log('Set notifications:', response?.length || 0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {

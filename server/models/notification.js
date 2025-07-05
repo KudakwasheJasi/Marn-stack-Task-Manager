@@ -1,3 +1,15 @@
+/**
+    * @description      : 
+    * @author           : kudakwashe Ellijah
+    * @group            : 
+    * @created          : 05/07/2025 - 18:08:27
+    * 
+    * MODIFICATION LOG
+    * - Version         : 1.0.0
+    * - Date            : 05/07/2025
+    * - Author          : kudakwashe Ellijah
+    * - Modification    : 
+**/
 import mongoose, { Schema } from "mongoose";
 
 const noticeSchema = new Schema(
@@ -23,7 +35,8 @@ const noticeSchema = new Schema(
   { timestamps: true }
 );
 
-noticeSchema.index({ task: 1, notiType: 1, createdBy: 1, "metadata.action": 1 }, { unique: true });
+// Temporarily comment out the unique index to debug
+// noticeSchema.index({ task: 1, notiType: 1, createdBy: 1, "metadata.action": 1 }, { unique: true });
 
 const Notice = mongoose.model("Notice", noticeSchema);
 

@@ -14,7 +14,7 @@ import express from "express";
 import { protectRoute } from "../middlewares/authMiddlewave.js";
 import Task from "../models/task.js";
 import User from "../models/User.js";
-import { notifyTaskDeleted } from "../utils/notificationService.js";
+import { notifyTaskDeleted, notifyTaskCreated } from "../utils/notificationService.js";
 
 const router = express.Router();
 
@@ -149,6 +149,13 @@ router.post("/create", protectRoute, async (req, res) => {
             .populate("activities.by", "name email");
 
         console.log('Populated task:', populatedTask);
+
+        // Get user name for notification
+        const user = await User.findById(req.user.userId).select('name');
+        const userName = user ? user.name : 'Unknown User';
+
+        // Create notification using the notification service
+        await notifyTaskCreated(populatedTask, userName);
 
         res.status(201).json({
             status: true,

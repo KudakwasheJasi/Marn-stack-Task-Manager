@@ -34,6 +34,15 @@ export const createNotification = async (notificationData) => {
       stage
     } = notificationData;
 
+    console.log('Creating notification with data:', {
+      team,
+      text: text.substring(0, 50) + '...',
+      task,
+      notiType,
+      createdBy,
+      action
+    });
+
     // Generate unique notification ID
     const notificationId = generateNotificationId(action, task, createdBy);
 
@@ -66,7 +75,7 @@ export const createNotification = async (notificationData) => {
       }
     });
 
-    console.log('Notification created:', notificationId);
+    console.log('Notification created successfully:', notificationId);
     return notification;
   } catch (error) {
     console.error('Error creating notification:', error);
@@ -82,9 +91,16 @@ export const createNotification = async (notificationData) => {
 // Create task creation notification
 export const notifyTaskCreated = async (task, createdBy) => {
   try {
+    console.log('Creating task creation notification for:', {
+      taskId: task._id,
+      taskTitle: task.title,
+      team: task.team,
+      createdBy: createdBy
+    });
+
     const text = `New task "${task.title}" has been created and assigned to you. Priority: ${task.priority}, Stage: ${task.stage}`;
     
-    await createNotification({
+    const notification = await createNotification({
       team: task.team,
       text,
       task: task._id,
@@ -95,6 +111,8 @@ export const notifyTaskCreated = async (task, createdBy) => {
       priority: task.priority,
       stage: task.stage
     });
+
+    console.log('Task creation notification result:', notification ? 'Success' : 'Failed or duplicate');
   } catch (error) {
     console.error('Error creating task creation notification:', error);
   }
@@ -188,6 +206,8 @@ export const notifySubtaskCreated = async (parentTask, subtask, createdBy) => {
 // Get notifications for a user
 export const getUserNotifications = async (userId, limit = 20) => {
   try {
+    console.log('Fetching notifications for user:', userId);
+    
     const notifications = await Notice.find({
       team: userId,
       isRead: { $nin: [userId] }
@@ -196,6 +216,15 @@ export const getUserNotifications = async (userId, limit = 20) => {
     .populate("createdBy", "name")
     .sort({ createdAt: -1 })
     .limit(limit);
+
+    console.log('Found notifications:', notifications.length);
+    console.log('Notification details:', notifications.map(n => ({
+      id: n._id,
+      type: n.notiType,
+      text: n.text.substring(0, 30) + '...',
+      task: n.task?.title,
+      createdBy: n.createdBy?.name
+    })));
 
     return notifications;
   } catch (error) {
